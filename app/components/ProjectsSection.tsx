@@ -1,4 +1,4 @@
-import { Github, ExternalLink } from 'lucide-react';
+import { Github, ExternalLink } from '@geist-ui/icons';
 
 export default function ProjectsSection() {
   const projects = [

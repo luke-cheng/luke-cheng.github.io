@@ -1,4 +1,4 @@
-import { BookOpen } from 'lucide-react';
+import { BookOpen } from '@geist-ui/icons';
 
 export default function BlogSection() {
   return (
