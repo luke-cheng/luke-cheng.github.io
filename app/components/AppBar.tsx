@@ -1,93 +1,137 @@
 "use client";
 
-import ChatInput from "./ChatInput";
-import { Message } from "../types/chat";
-
 interface AppBarProps {
   isSticky: boolean;
-  onChatSend?: () => void;
-  messages?: Message[];
-  onSendMessage?: (message: Message) => void;
-  onFirstMessage?: () => void;
-  input?: string;
-  onInputChange?: (value: string) => void;
 }
 
-export default function AppBar({ isSticky, onChatSend, messages = [], onSendMessage, onFirstMessage, input = "", onInputChange }: AppBarProps) {
+export default function AppBar({ isSticky }: AppBarProps) {
   return (
-    <header
-      className={`transition-all duration-300 ${
-        isSticky
-          ? "fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800"
-          : "absolute bottom-0 left-0 right-0 z-50 bg-transparent"
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo/Name */}
-          <div className="flex items-center">
-            <h1 className="text-xl font-bold text-white">Luke Cheng</h1>
-          </div>
-
-          {/* Chat Input - only show when sticky */}
-          {isSticky && (
-            <ChatInput 
-              variant="minimal" 
-              messages={messages}
-              onSend={onSendMessage}
-              onFirstMessage={onFirstMessage}
-              input={input}
-              onInputChange={onInputChange}
-            />
-          )}
-
-          <nav className="hidden md:flex space-x-8">
-            <a
-              href="#about"
-              className="text-gray-300 hover:text-white transition-colors"
+    <>
+      {/* Static Navigation Bar - initially visible under welcome section */}
+      <nav className={`w-full bg-black/90 backdrop-blur-md border-b border-gray-800 transition-all duration-300 ${
+        isSticky ? 'opacity-0 pointer-events-none' : 'opacity-100'
+      }`}>
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="text-white font-bold text-lg">Luke Cheng</div>
+          
+          <div className="flex gap-6">
+            <button
+              onClick={() => {
+                document
+                  .getElementById("about")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="text-white hover:text-blue-400 transition-colors duration-300"
             >
               About
-            </a>
-            <a
-              href="#experience"
-              className="text-gray-300 hover:text-white transition-colors"
+            </button>
+            <button
+              onClick={() => {
+                document
+                  .getElementById("experience")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="text-white hover:text-blue-400 transition-colors duration-300"
             >
               Experience
-            </a>
-            <a
-              href="#projects"
-              className="text-gray-300 hover:text-white transition-colors"
+            </button>
+            <button
+              onClick={() => {
+                document
+                  .getElementById("projects")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="text-white hover:text-blue-400 transition-colors duration-300"
             >
               Projects
-            </a>
-            <a
-              href="#contact"
-              className="text-gray-300 hover:text-white transition-colors"
+            </button>
+            <button
+              onClick={() => {
+                document
+                  .getElementById("blog")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="text-white hover:text-blue-400 transition-colors duration-300"
+            >
+              Blog
+            </button>
+            <button
+              onClick={() => {
+                document
+                  .getElementById("contact")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="text-white hover:text-blue-400 transition-colors duration-300"
             >
               Contact
-            </a>
-          </nav>
-
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <button className="text-gray-300 hover:text-white">
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
             </button>
           </div>
         </div>
-      </div>
-    </header>
+      </nav>
+
+      {/* Sticky Navigation Bar - appears when welcome section is out of view */}
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-md border-b border-gray-800 transition-all duration-300 ${
+          isSticky ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
+        }`}
+      >
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="text-white font-bold text-lg">Luke Cheng</div>
+          
+          <div className="flex gap-4">
+            <button
+              onClick={() => {
+                document
+                  .getElementById("about")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="text-white hover:text-blue-400 transition-colors duration-300"
+            >
+              About
+            </button>
+            <button
+              onClick={() => {
+                document
+                  .getElementById("experience")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="text-white hover:text-blue-400 transition-colors duration-300"
+            >
+              Experience
+            </button>
+            <button
+              onClick={() => {
+                document
+                  .getElementById("projects")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="text-white hover:text-blue-400 transition-colors duration-300"
+            >
+              Projects
+            </button>
+            <button
+              onClick={() => {
+                document
+                  .getElementById("blog")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="text-white hover:text-blue-400 transition-colors duration-300"
+            >
+              Blog
+            </button>
+            <button
+              onClick={() => {
+                document
+                  .getElementById("contact")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="text-white hover:text-blue-400 transition-colors duration-300"
+            >
+              Contact
+            </button>
+          </div>
+        </div>
+      </nav>
+    </>
   );
-};
+}

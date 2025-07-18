@@ -5,7 +5,7 @@ export default function AboutSection() {
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-white mb-4">About Me</h2>
           <p className="text-xl text-gray-300">
-            At core, I'm a thinker. From chemistry to code, I chase the patterns that connect everything.
+            At core, I'm a thinker. From chemistry to programming, I chase the patterns that connect everything.
           </p>
         </div>
 
@@ -54,13 +54,13 @@ export default function AboutSection() {
 
             {/* Current Focus */}
             <div>
-              <h4 className="text-lg font-medium text-white mb-3">What I'm Thinking About</h4>
+              <h4 className="text-lg font-medium text-white mb-3">What currently occupies my mind</h4>
               <div className="space-y-2 text-gray-300">
-                <p>• How to make complex systems feel simple</p>
-                <p>• The intersection of healthcare and technology</p>
-                <p>• Building tools that actually get used</p>
-                <p>• Why my website keeps breaking when I add features</p>
-                <p>• Whether I should learn Rust or just stick with Python</p>
+                <p>- How to make complex systems feel simple</p>
+                <p>- The intersection of healthcare and technology</p>
+                <p>- Building tools that actually get used</p>
+                <p>- Why my website keeps breaking when I add features</p>
+                <p>- What to write for my next blog post</p>
               </div>
             </div>
           </div>

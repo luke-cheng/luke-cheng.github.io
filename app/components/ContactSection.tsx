@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Mail, Github, Linkedin, MapPin, Key } from 'lucide-react';
+import { Mail, Github, Linkedin, MapPin, Key } from '@geist-ui/icons';
 
 export default function ContactSection() {
   const [formData, setFormData] = useState({
@@ -10,18 +10,29 @@ export default function ContactSection() {
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
-    // TODO: Implement actual form submission
-    // For now, just simulate a delay
-    setTimeout(() => {
+    setStatus('idle');
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      if (res.ok) {
+        setStatus('success');
+        setFormData({ name: '', email: '', message: '' });
+      } else {
+        setStatus('error');
+      }
+    } catch (err) {
+      setStatus('error');
+    } finally {
       setIsSubmitting(false);
-      setFormData({ name: '', email: '', message: '' });
-      alert('Thank you for your message! I\'ll get back to you soon.');
-    }, 1000);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -101,6 +112,12 @@ export default function ContactSection() {
               >
                 {isSubmitting ? 'Sending...' : 'Send Message'}
               </button>
+              {status === 'success' && (
+                <p className="text-green-400 mt-2">Thank you for your message! I'll get back to you soon.</p>
+              )}
+              {status === 'error' && (
+                <p className="text-red-400 mt-2">Failed to send message. Please try again later.</p>
+              )}
             </form>
           </div>
 
@@ -132,7 +149,7 @@ export default function ContactSection() {
                     </a>
                     <a href="https://github.com/Luke-Cheng.gpg" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-gray-300 text-sm flex items-center gap-1">
                       <Key className="w-3 h-3" />
-                      GPG Key
+                      GPG Key for encrypted email (for the paranoid)
                     </a>
                   </div>
                 </div>

@@ -5,10 +5,9 @@ import { ApiClient } from "../utils/apiClient";
 import { ChatRequest } from "../types/api";
 import { Message } from "../types/chat";
 import { handleError } from "../utils/errorHandler";
-import { Send } from 'lucide-react';
+import { Send } from "@geist-ui/icons";
 
 interface ChatInputProps {
-  variant: "full" | "minimal";
   messages?: Message[];
   onSend?: (message: Message) => void;
   onFirstMessage?: () => void;
@@ -16,7 +15,13 @@ interface ChatInputProps {
   onInputChange?: (value: string) => void;
 }
 
-export default function ChatInput({ variant, messages = [], onSend, onFirstMessage, input = "", onInputChange }: ChatInputProps) {
+export default function ChatInput({
+  messages = [],
+  onSend,
+  onFirstMessage,
+  input = "",
+  onInputChange,
+}: ChatInputProps) {
   const [localInput, setLocalInput] = useState(input);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -26,9 +31,8 @@ export default function ChatInput({ variant, messages = [], onSend, onFirstMessa
   }, [input]);
 
   // Get the latest user message for placeholder
-  const latestUserMessage = messages
-    .filter(msg => msg.role === 'user')
-    .pop()?.content || "";
+  const latestUserMessage =
+    messages.filter((msg) => msg.role === "user").pop()?.content || "";
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -42,7 +46,7 @@ export default function ChatInput({ variant, messages = [], onSend, onFirstMessa
 
     const userMessage: Message = {
       id: `user-${Date.now()}`,
-      role: 'user',
+      role: "user",
       content: localInput.trim(),
       timestamp: new Date(),
     };
@@ -58,9 +62,9 @@ export default function ChatInput({ variant, messages = [], onSend, onFirstMessa
 
     try {
       // Prepare chat history for API
-      const history = messages.map(msg => ({
+      const history = messages.map((msg) => ({
         text: msg.content,
-        isUser: msg.role === 'user',
+        isUser: msg.role === "user",
       }));
 
       const request = {
@@ -74,8 +78,8 @@ export default function ChatInput({ variant, messages = [], onSend, onFirstMessa
       // Create AI message placeholder
       const aiMessage: Message = {
         id: `ai-${Date.now()}`,
-        role: 'assistant',
-        content: '',
+        role: "assistant",
+        content: "",
         timestamp: new Date(),
       };
 
@@ -83,10 +87,10 @@ export default function ChatInput({ variant, messages = [], onSend, onFirstMessa
       onSend?.(aiMessage);
 
       // Make API call with streaming
-      const response = await fetch('/api/chat', {
-        method: 'POST',
+      const response = await fetch("/api/chat", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(request),
       });
@@ -98,10 +102,10 @@ export default function ChatInput({ variant, messages = [], onSend, onFirstMessa
       // Handle streaming response
       const reader = response.body?.getReader();
       if (!reader) {
-        throw new Error('No response body');
+        throw new Error("No response body");
       }
 
-      let fullText = '';
+      let fullText = "";
       const decoder = new TextDecoder();
 
       while (true) {
@@ -109,10 +113,10 @@ export default function ChatInput({ variant, messages = [], onSend, onFirstMessa
         if (done) break;
 
         const chunk = decoder.decode(value);
-        const lines = chunk.split('\n');
+        const lines = chunk.split("\n");
 
         for (const line of lines) {
-          if (line.startsWith('data: ')) {
+          if (line.startsWith("data: ")) {
             try {
               const data = JSON.parse(line.slice(6));
               if (data.text) {
@@ -134,21 +138,20 @@ export default function ChatInput({ variant, messages = [], onSend, onFirstMessa
           }
         }
       }
-
     } catch (error) {
       console.error("Chat error:", error);
-      
+
       // Use the error handler to get a proper error message
       const errorMessageText = handleError(error);
-      
+
       // Add error message as AI response
       const errorMessage: Message = {
         id: `error-${Date.now()}`,
-        role: 'assistant',
+        role: "assistant",
         content: errorMessageText,
         timestamp: new Date(),
       };
-      
+
       // Don't send user message again, just send the error message
       setTimeout(() => {
         onSend?.(errorMessage);
@@ -158,33 +161,11 @@ export default function ChatInput({ variant, messages = [], onSend, onFirstMessa
     }
   };
 
-  if (variant === "minimal") {
-    return (
-      <form onSubmit={handleSubmit} className="flex-1 max-w-md mx-4">
-        <div className="relative">
-          <input
-            type="text"
-            value={localInput}
-            onChange={handleInputChange}
-            className="w-full bg-gray-800/50 border border-gray-600/50 rounded-full px-4 py-2 text-white text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-300 backdrop-blur-sm"
-            disabled={isLoading}
-            placeholder={messages.length === 0 ? "Ask about me..." : latestUserMessage || "Ask about me..."}
-            autoComplete="off"
-          />
-          <button
-            type="submit"
-            disabled={!localInput.trim() || isLoading}
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white p-1 rounded-full transition-all duration-300"
-          >
-            <Send className="w-4 h-4" />
-          </button>
-        </div>
-      </form>
-    );
-  }
-
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2 transition-all duration-700 ease-in-out mb-6">
+    <form
+      onSubmit={handleSubmit}
+      className="flex gap-2 transition-all duration-700 ease-in-out mb-6"
+    >
       <div className="flex-1 relative">
         <input
           type="text"
@@ -210,19 +191,18 @@ export default function ChatInput({ variant, messages = [], onSend, onFirstMessa
                 , the website, or anything else!
               </>
             ) : (
-              latestUserMessage || "Ask about me, the website, or anything else!"
+              latestUserMessage
             )}
           </div>
         )}
       </div>
-      
+
       <button
         type="submit"
-        disabled={!localInput.trim() || isLoading}
         className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 disabled:transform-none"
       >
-        Send
+        <Send className="w-5 h-5" />
       </button>
     </form>
   );
-} 
+}
