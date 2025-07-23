@@ -32,7 +32,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Use static Next.js config (for GitHub Pages)
-        run: cp next.config.static.ts next.config.ts
+        run: cp next.config.static.ts next.config.ts & rm -rf app/api
       - name: Detect package manager
         id: detect-package-manager
         run: |
