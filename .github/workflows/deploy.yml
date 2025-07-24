@@ -34,6 +34,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Abort if NEXT_PUBLIC_API_BASE_URL is not set
+        run: |
+          if [ -z "${NEXT_PUBLIC_API_BASE_URL}" ]; then
+            echo "NEXT_PUBLIC_API_BASE_URL is not set. Aborting deployment."
+            exit 1
+          fi
       - name: Prepare for static build (for GitHub Pages)
         run: cp next.config.static.ts next.config.ts & rm -rf app/api
       - name: Detect package manager
