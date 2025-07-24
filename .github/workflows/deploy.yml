@@ -2,7 +2,7 @@
 #
 # To get started with Next.js see: https://nextjs.org/docs/getting-started
 #
-name: Deploy Next.js site to Pages
+name: Static Deploy to GitHub Pages
 
 on:
   # Runs on pushes targeting the default branch
@@ -36,9 +36,11 @@ jobs:
         uses: actions/checkout@v4
       - name: Abort if NEXT_PUBLIC_API_BASE_URL is not set
         run: |
-          if [ -z "${NEXT_PUBLIC_API_BASE_URL}" ]; then
-            echo "NEXT_PUBLIC_API_BASE_URL is not set. Aborting deployment."
+          if [ "${#NEXT_PUBLIC_API_BASE_URL}" -lt 10 ]; then
+            echo "NEXT_PUBLIC_API_BASE_URL is too short. Aborting deployment."
             exit 1
+          else
+            echo "NEXT_PUBLIC_API_BASE_URL is set to ${NEXT_PUBLIC_API_BASE_URL}"
           fi
       - name: Prepare for static build (for GitHub Pages)
         run: cp next.config.static.ts next.config.ts & rm -rf app/api
