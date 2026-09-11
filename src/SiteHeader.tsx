@@ -1,6 +1,6 @@
 import type { FormEvent } from "react";
 import type { PortfolioTab } from "./types";
-
+import { Sparkles, Sqaure } from "lucide-react";
 type SiteHeaderProps = {
   tabs: PortfolioTab[];
   activeTab: string;
@@ -71,7 +71,7 @@ function SiteHeader({
               title="Stop generating"
               onClick={onStop}
             >
-              <span aria-hidden="true">×</span>
+              <span aria-hidden="true">< Square /></span>
             </button>
           ) : (
             <button
@@ -80,7 +80,7 @@ function SiteHeader({
               aria-label="Ask question"
               disabled={!question.trim()}
             >
-              <span className="return-icon" aria-hidden="true" />
+              < Sparkles />
             </button>
           )}
         </form>
