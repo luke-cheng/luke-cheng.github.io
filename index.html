@@ -7,9 +7,51 @@
     <meta name="theme-color" content="#f1f0e9" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#171917" media="(prefers-color-scheme: dark)" />
     <title>Luke Cheng / Local portfolio</title>
+    <style>
+      #boot-fallback {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 3rem 1.25rem;
+        font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #171917;
+      }
+      #boot-fallback h1 {
+        margin: 0 0 0.75rem;
+        font-size: 1.875rem;
+        line-height: 1.1;
+      }
+      #boot-fallback p {
+        margin: 0 0 0.75rem;
+      }
+      @media (prefers-color-scheme: dark) {
+        #boot-fallback {
+          color: #f0f0e8;
+          background: #171917;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <article id="boot-fallback" hidden>
+      <h1>This page could not load the app bundle.</h1>
+      <p>
+        Your browser blocked the module script response for this page. This usually means the site is
+        serving source files instead of the built production assets.
+      </p>
+      <p>Try a hard refresh first. If this keeps happening, the GitHub Pages source needs to use the Actions deployment output.</p>
+    </article>
+    <div id="root" hidden></div>
+    <script>
+      window.__bootFallbackTimer = window.setTimeout(() => {
+        if (!window.__appBooted) {
+          document.getElementById("boot-fallback")?.removeAttribute("hidden");
+        }
+      }, 4000);
+    </script>
+    <script
+      type="module"
+      src="/src/main.tsx"
+      onerror="document.getElementById('boot-fallback')?.removeAttribute('hidden')"
+    ></script>
   </body>
 </html>
