@@ -1,20 +1,7 @@
-import type { FormEvent } from "react";
-import type { PortfolioTab } from "./types";
-import { Sparkles, Sqaure } from "lucide-react";
-type SiteHeaderProps = {
-  tabs: PortfolioTab[];
-  activeTab: string;
-  question: string;
-  statusLabel: string;
-  isReady: boolean;
-  isGenerating: boolean;
-  onTabChange: (tab: PortfolioTab) => void;
-  onQuestionChange: (question: string) => void;
-  onQuestion: (event: FormEvent<HTMLFormElement>) => void;
-  onStop: () => void;
-  onReset: () => void;
-};
+import type { SiteHeaderProps } from "./types";
 
+import AssistantIcon from "@mui/icons-material/Assistant";
+import CancelScheduleSendIcon from "@mui/icons-material/CancelScheduleSend";
 function SiteHeader({
   tabs,
   activeTab,
@@ -55,9 +42,13 @@ function SiteHeader({
           <input
             value={question}
             onChange={(event) => onQuestionChange(event.target.value)}
-            placeholder="Ask the portfolio a question..."
+            placeholder={
+              isReady
+                ? "Ask the portfolio a question..."
+                : "Local AI is not ready"
+            }
             aria-label="Ask the portfolio a question"
-            disabled={isGenerating}
+            disabled={!isReady || isGenerating}
           />
           <span className="model-status">
             <span className={`status-dot ${isReady ? "ready" : ""}`} />
@@ -71,16 +62,18 @@ function SiteHeader({
               title="Stop generating"
               onClick={onStop}
             >
-              <span aria-hidden="true">< Square /></span>
+              <span aria-hidden="true">
+                <CancelScheduleSendIcon />
+              </span>
             </button>
           ) : (
             <button
               className="submit-button"
               type="submit"
               aria-label="Ask question"
-              disabled={!question.trim()}
+              disabled={!isReady || !question.trim()}
             >
-              < Sparkles />
+              <AssistantIcon />
             </button>
           )}
         </form>

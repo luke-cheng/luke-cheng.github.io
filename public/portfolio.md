@@ -6,12 +6,12 @@
 
 ### Software Engineer | JPMorgan Chase, New York, NY
 
-_Dec 2025 – Present_
+> Dec 2025 - Present
 
 - Contributed to the query side of a CQRS-style centralized customer data platform, building the Customer Summary Utility to consolidate customer information from multiple internal systems and serve 10M+ daily requests (~10K TPS) with p99 latency below 200 ms using Java, Spring Boot, Kafka, Cassandra, and CockroachDB.
-- Implemented Change Data Capture (CDC) to propagate database changes through lightweight Kafka events rather than transmitting full customer payloads, reducing messaging overhead and enabling lower-latency updates to the customer read model.
+- Implemented Change Data Capture design pattern to propagate database changes through lightweight Kafka events rather than transmitting full customer payloads, reducing messaging overhead and enabling lower-latency updates to the customer read model.
 - Implemented reactive Kafka consumers with batch processing to asynchronously process customer-data changes at high throughput, keeping the query-side data model synchronized while reducing coupling between upstream systems and the customer-facing API.
-- Supported the platform’s transition to Kubernetes-based infrastructure as traffic increased, improving horizontal scalability, deployment consistency, and operational reliability for high-throughput services.
+- Supported the platform's transition to Kubernetes-based infrastructure as traffic increased, improving horizontal scalability, deployment consistency, and operational reliability for high-throughput services.
 - Expanded automated testing across diverse customer datasets—including addresses, phone numbers, account-to-customer relationships, account identifiers, and card data—using JUnit and Cucumber, providing regression coverage for data-processing paths that could not be reliably exercised through UAT alone.
 - Extended the API and underlying data model to support multiple physical and virtual card numbers associated with a single account, enabling customer-data services to accommodate mobile-wallet and virtual-card use cases without relying on one-to-one account-to-card mappings.
 - Standardized deployment configuration across environments to improve consistency between test and production, reducing environment-specific configuration issues and increasing confidence in production releases.
@@ -21,15 +21,15 @@ _Dec 2025 – Present_
 
 ### Co-Founder | MOYU LLC, Pittsburgh, PA
 
-_Feb 2023 – Jan 2024_
+> Feb 2023 - Jan 2024
 
 - Founded an early-stage startup exploring semantic version control for CAD/BIM assets, addressing workflow limitations for complex engineering design files.
 - Developed cross-platform visualization and revision-diff tooling using Next.js, Electron, and Three.js for large-scale 2D and 3D architectural models.
-- Researched multimodal computer vision and geometric reasoning techniques for engineering design understanding to inform product strategy.
+- Researched multi-module computer vision and geometric reasoning techniques for engineering design understanding to inform product strategy.
 
 ### Graduate Software Developer | University of Pittsburgh Medical Center, Pittsburgh, PA
 
-_Feb 2023 – Jan 2024_
+> Feb 2023 - Jan 2024
 
 - Built a HIPAA-compliant clinical analytics platform by translating requirements from 50+ clinicians into scalable healthcare software using Java, Spring Boot, MySQL, FHIR APIs, and AWS.
 - Developed Python NLP pipelines using spaCy, NLTK, and custom information extraction techniques to convert unstructured clinical notes into structured medical knowledge.
@@ -38,7 +38,7 @@ _Feb 2023 – Jan 2024_
 
 ### Research Scientist | ChemPacific Corp, Baltimore, MD
 
-_May 2021 – May 2022_
+> May 2021 - May 2022
 
 - Applied data science techniques to laboratory manufacturing datasets, building Python workflows that improved process visibility and operational decision-making.
 - Designed automated laboratory data pipelines integrating Agilent analytical instrumentation with enterprise systems, improving traceability and reducing manual processing.
@@ -49,11 +49,11 @@ _May 2021 – May 2022_
 
 ### Master of Science in Computer & Information Science | University of Pittsburgh
 
-_Aug 2022 – May 2024_
+> Aug 2022 - May 2024
 
 ### Bachelor of Science in Chemistry and Philosophy | Virginia Tech
 
-_Aug 2016 – Dec 2020_
+> Aug 2016 - Dec 2020
 
 ## Personal Projects
 
@@ -89,7 +89,7 @@ _Aug 2016 – Dec 2020_
 - **Skiing**: Active meditation and outdoor focus.
 - **Philosophy**: Critical thinking, ethics, and epistemology.
 - **Gaming & Simulation**:
-  - _Automation & Systems_: Screeps, Factorio (modular design, programmatic problem-solving).
-  - _Resource Management_: Oxygen Not Included (prioritization and system balance under constraints).
-  - _Narrative & Ethics_: This War of Mine, Papers, Please (high-stakes decision-making and ethical dilemmas).
-  - _Visual & Interactive Design_: Return of the Obra Dinn, What Remains of Edith Finch (deduction, atmosphere, and visual storytelling).
+  - Automation & Systems: Screeps, Factorio (modular design, programmatic problem-solving).
+  - Resource Management: Oxygen Not Included (prioritization and system balance under constraints).
+  - Narrative & Ethics: This War of Mine, Papers, Please (high-stakes decision-making and ethical dilemmas).
+  - Visual & Interactive Design: Return of the Obra Dinn, What Remains of Edith Finch (deduction, atmosphere, and visual storytelling).

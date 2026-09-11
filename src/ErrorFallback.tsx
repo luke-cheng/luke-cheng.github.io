@@ -1,27 +1,25 @@
-import type { Availability } from "./types";
+import type { ErrorFallbackProps } from "./types";
 
-type ErrorFallbackProps = {
-  availability: Availability | "checking";
-  progress: number;
-  error: string;
-  onActivate: () => void;
-};
-
-function ErrorFallback({ availability, progress, error, onActivate }: ErrorFallbackProps) {
+function ErrorFallback({
+  availability,
+  progress,
+  error,
+  onActivate,
+}: ErrorFallbackProps) {
   return (
     <section className="ai-gate" aria-live="polite">
-      <span className="eyebrow">Local inference layer</span>
+      <span className="eyebrow">Notice</span>
       <h2>
         {availability === "unavailable"
-          ? "This portfolio needs Chrome’s built-in AI."
+          ? "This website is best viewed in a browser with built-in AI."
           : availability === "downloading"
-            ? "The model is arriving locally."
+            ? "The AI model is downloading."
             : "A browser-native portfolio, still warming up."}
       </h2>
       <p>
         {availability === "unavailable"
-          ? "Open this site in a supported desktop version of Chrome with Prompt API access. The editorial preview remains available below."
-          : "The first visit downloads the model to your device. Nothing in this portfolio is sent to a remote AI service."}
+          ? "Open this site in a supported desktop version of Chrome with Prompt API access, or check out the links in the footer."
+          : "Your first visit downloads the model to your device. Nothing is sent to a remote AI service."}
       </p>
       {availability === "downloading" && (
         <div className="progress-track">

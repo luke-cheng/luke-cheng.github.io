@@ -4,37 +4,7 @@ import "./App.css";
 import CanvasArea from "./CanvasArea";
 import SiteFooter from "./SiteFooter";
 import SiteHeader from "./SiteHeader";
-import type { Availability, PortfolioTab } from "./types";
-type ModelMonitor = {
-  addEventListener: (
-    type: "downloadprogress",
-    listener: (event: { loaded: number }) => void,
-  ) => void;
-};
-type PromptSession = {
-  prompt: (
-    input: string | Array<{ role: string; content: string }>,
-    options?: { signal?: AbortSignal; responseConstraint?: object },
-  ) => Promise<string>;
-  promptStreaming: (
-    input: string,
-    options?: { signal?: AbortSignal },
-  ) => ReadableStream<string>;
-  destroy: () => void;
-};
-type LanguageModelApi = {
-  availability: (options: object) => Promise<Availability>;
-  create: (options?: {
-    initialPrompts?: Array<{ role: string; content: string }>;
-    monitor?: (monitor: ModelMonitor) => void;
-  }) => Promise<PromptSession>;
-};
-
-declare global {
-  interface Window {
-    LanguageModel?: LanguageModelApi;
-  }
-}
+import type { Availability, PortfolioTab, PromptSession } from "./types";
 
 const modelOptions = {
   expectedInputs: [{ type: "text", languages: ["en"] }],
@@ -46,7 +16,7 @@ const tabSchema = {
     tabs: {
       type: "array",
       minItems: 3,
-      maxItems: 3,
+      maxItems: 5,
       items: {
         type: "object",
         properties: {
@@ -75,8 +45,7 @@ const fallbackTabs: PortfolioTab[] = [
   {
     id: "outside",
     label: "Outside the stack",
-    prompt:
-      "Focus on leadership, interests, and the ideas behind the work.",
+    prompt: "Focus on leadership, interests, and the ideas behind the work.",
   },
 ];
 const fallbackCanvas = `<article class="landing-canvas"><p class="eyebrow">Luke's website</p><h1>Click a tab above.</h1><p>And get your browser AI to work.</p></article>`;
@@ -88,6 +57,10 @@ Structure every canvas response in exactly this order: Summary, Why, then How. U
 
 Portfolio source:
 `;
+
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : String(error);
+}
 
 function sanitizeCanvas(html: string) {
   const withoutFences = html
@@ -159,8 +132,9 @@ function App() {
       );
       const parsed = JSON.parse(result) as { tabs?: PortfolioTab[] };
       if (parsed.tabs?.length === 3) setTabs(parsed.tabs);
-    } catch {
-      setError("Local AI could not start. The preview remains available.");
+    } catch (error) {
+      console.error(error);
+      setError(getErrorMessage(error));
     }
   };
 
@@ -177,8 +151,9 @@ function App() {
         setPortfolio(source);
         setAvailability(status);
         if (status === "available") await createSession(source);
-      } catch {
-        if (!cancelled) setError("The portfolio source could not be loaded.");
+      } catch (error) {
+        console.error(error);
+        if (!cancelled) setError(getErrorMessage(error));
       }
     };
     void boot();
@@ -216,10 +191,10 @@ function App() {
         setCanvas(sanitizeCanvas(output));
       }
     } catch (generationError) {
-      if ((generationError as Error).name !== "AbortError")
-        setError(
-          "This composition could not be generated. Your previous view is still here.",
-        );
+      if ((generationError as Error).name !== "AbortError") {
+        console.error(generationError);
+        setError(getErrorMessage(generationError));
+      }
     } finally {
       setIsGenerating(false);
     }
@@ -233,7 +208,9 @@ function App() {
     const trimmedQuestion = question.trim();
     if (!trimmedQuestion) return;
     if (!isReady) {
-      setError("Local AI is not ready yet. Your question is ready when Chrome AI becomes available.");
+      setError(
+        "Local AI is not ready yet. Your question is ready when Chrome AI becomes available.",
+      );
       return;
     }
     setQuestion("");

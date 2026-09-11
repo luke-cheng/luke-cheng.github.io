@@ -1,16 +1,5 @@
 import ErrorFallback from "./ErrorFallback";
-import type { Availability } from "./types";
-
-type CanvasAreaProps = {
-  isReady: boolean;
-  isGenerating: boolean;
-  availability: Availability | "checking";
-  progress: number;
-  canvas: string;
-  error: string;
-  onActivate: () => void;
-  onDismissError: () => void;
-};
+import type { CanvasAreaProps } from "./types";
 
 function CanvasArea({
   isReady,

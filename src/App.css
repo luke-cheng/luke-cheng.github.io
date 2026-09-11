@@ -113,7 +113,6 @@ button {
   font-size: 10px;
 }
 .status-dot,
-.footer-signal,
 .pulse {
   display: inline-block;
   width: 7px;
@@ -123,7 +122,7 @@ button {
   background: var(--coral);
 }
 .status-dot.ready,
-.footer-signal {
+.status-dot.ready {
   background: #60a436;
 }
 .question-bar {
