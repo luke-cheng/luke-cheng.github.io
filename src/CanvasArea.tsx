@@ -8,7 +8,6 @@ function CanvasArea({
   progress,
   canvas,
   error,
-  onActivate,
   onDismissError,
 }: CanvasAreaProps) {
   return (
@@ -18,7 +17,6 @@ function CanvasArea({
           availability={availability}
           progress={progress}
           error={error}
-          onActivate={onActivate}
         />
       )}
       {isReady && (

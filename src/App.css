@@ -95,18 +95,6 @@ button {
   font-weight: 600;
   letter-spacing: -0.05em;
 }
-.identity-button {
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: 600 20px var(--sans);
-  letter-spacing: -0.05em;
-  padding: 0;
-}
-.identity-button:hover,
-.identity-button:focus-visible {
-  color: var(--coral);
-}
 .model-status {
   flex: 0 0 auto;
   color: var(--muted);
@@ -121,7 +109,6 @@ button {
   border-radius: 50%;
   background: var(--coral);
 }
-.status-dot.ready,
 .status-dot.ready {
   background: #60a436;
 }
@@ -176,25 +163,6 @@ button {
 .submit-button:disabled {
   cursor: default;
   opacity: 0.45;
-}
-.return-icon {
-  position: relative;
-  display: block;
-  width: 15px;
-  height: 13px;
-  border-bottom: 2px solid currentColor;
-  border-left: 2px solid currentColor;
-}
-.return-icon::after {
-  position: absolute;
-  right: -1px;
-  bottom: -3px;
-  width: 7px;
-  height: 7px;
-  border-right: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
-  content: "";
-  transform: rotate(-45deg);
 }
 .exit-button {
   display: grid;
@@ -416,9 +384,6 @@ button {
   background: transparent;
   color: var(--acid);
   font: inherit;
-}
-.pulse {
-  animation: pulse 1s infinite;
 }
 .site-footer {
   display: flex;

@@ -20,6 +20,7 @@ export type ModelMonitor = {
 };
 
 export type PromptSession = {
+  clone: () => Promise<PromptSession>;
   prompt: (
     input: string | Array<{ role: string; content: string }>,
     options?: { signal?: AbortSignal; responseConstraint?: object },
@@ -34,6 +35,8 @@ export type PromptSession = {
 export type LanguageModelApi = {
   availability: (options: object) => Promise<Availability>;
   create: (options?: {
+    expectedInputs?: Array<{ type: string; languages?: string[] }>;
+    expectedOutputs?: Array<{ type: string; languages?: string[] }>;
     initialPrompts?: Array<{ role: string; content: string }>;
     monitor?: (monitor: ModelMonitor) => void;
   }) => Promise<PromptSession>;
@@ -60,7 +63,6 @@ export type CanvasAreaProps = {
   progress: number;
   canvas: string;
   error: string;
-  onActivate: () => void;
   onDismissError: () => void;
 };
 
@@ -68,7 +70,6 @@ export type ErrorFallbackProps = {
   availability: Availability | "checking";
   progress: number;
   error: string;
-  onActivate: () => void;
 };
 
 declare global {

@@ -1,6 +1,6 @@
 # Luke-Cheng.github.io
 
-An experimental personal website which generate content on the fly base on my CV with Google Chrome's local Nano banana. 
+An experimental personal website which generate the html page as user interact with Google Chrome's on-device AI, Gemini Nano banana.
 
 ## Prompt
 
@@ -9,14 +9,17 @@ An experimental personal website which generate content on the fly base on my CV
 ````md
 Help me design a experimental personal website which generate content on the fly that use google chrome build-in ai to based on a long text provided that contain all information (i.e. experience, contact info, etc). This will be purely front end project because Im utilizing the chrome browser ai.
 
-so we'll have the source of truth as a public markdown and use the prompt api to generate each page.
+so we'll have the source of truth as a public markdown and use the prompt API to generate each page.
 
 ## Some component I have in mind
 
 ### Data & Feature Detection
 
-- Feature-check for Chrome's Prompt API on boot. Render an `ErrorFallback` UI with model download progress if missing/downloading.
+- Feature-check for Chrome's prompt API on boot. Render an `ErrorFallback` UI with model download progress if missing/downloading.
 - Fetch `/public/portfolio.md` once at application startup and cache it as context in a persistent SLM session.
+- the decision tree of detecting ai model
+  - if browser don't support ai, the render error like "this website is best experience with a browser with build-in AI. e.g. Google chrome >= 138, or you may checkout my linkedin the using the link below: <links>"
+  - else: check if model is downloaded, if not downloaded, initial the downloading process and display the progress bar & when it's finished downloading, trigger a page refresh
 
 ### Header & Navigation
 
@@ -33,17 +36,8 @@ so we'll have the source of truth as a public markdown and use the prompt api to
 
 ### Static Footer
 
-- Fixed footer displaying something alone: _"Content and layout dynamically generated via Your Browser's Local AI. So be careful with navigating as it'll trigger a regenerate."_ With icons to github, to linkedin, and to `/public/portfolio.md` for users to view the raw content.
+- Fixed footer displaying something alone: _"Content and layout dynamically generated via Your Browser's on-device AI. So be careful with navigating as it'll trigger a regenerate."_ With icons to github, to linkedin, and to `/public/portfolio.md` for users to view the raw portfolio.
 
-the prompt api doc is under ./The Prompt API.md
+the prompt API doc is under ./The prompt API.md
 Lets run through the design first
 ````
-
-```md
-update the theme & make the initial landing page spacious and almost no content so the focus will be in the clicking the tabs. and make it honor system's theme. make header two row with name on left (no logo just name), tabs on right. and the input bar on bottom
-```
-
-
-```md
-this should be the initial canvas, if the browser is not satisfy with what we have, this part should not exist either. when teh browser does not meet our requirement, only the error page should be shown, simplify cursor only to loading when ai is generate. and normal when ai is not. & the enter icon is not displaying properly in chat input
-```
