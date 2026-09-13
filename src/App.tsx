@@ -25,13 +25,12 @@ function App() {
         onReset={ai.onReset}
       />
       <CanvasArea
-        isReady={ai.isReady}
-        isGenerating={ai.isGenerating}
-        availability={ai.availability}
-        progress={ai.progress}
+        phase={ai.phase}
         canvas={ai.canvas}
-        error={ai.error}
+        isGenerating={ai.isGenerating}
+        generationError={ai.generationError}
         onDismissError={ai.onDismissError}
+        onReset={ai.onReset}
       />
       <SiteFooter />
     </div>

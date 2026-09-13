@@ -1,46 +1,26 @@
-import type { FormEvent } from "react";
-
-export type Availability =
-  | "available"
-  | "downloadable"
-  | "downloading"
-  | "unavailable";
-
 export type PortfolioTab = {
   id: string;
   label: string;
   prompt: string;
 };
 
-export type ModelMonitor = {
-  addEventListener: (
-    type: "downloadprogress",
-    listener: (event: { loaded: number }) => void,
-  ) => void;
+/** Raw error from the API — name and message surfaced directly, no interpretation. */
+export type AiError = {
+  name: string;
+  message: string;
 };
 
-export type PromptSession = {
-  clone: () => Promise<PromptSession>;
-  prompt: (
-    input: string | Array<{ role: string; content: string }>,
-    options?: { signal?: AbortSignal; responseConstraint?: object },
-  ) => Promise<string>;
-  promptStreaming: (
-    input: string,
-    options?: { signal?: AbortSignal },
-  ) => ReadableStream<string>;
-  destroy: () => void;
-};
-
-export type LanguageModelApi = {
-  availability: (options: object) => Promise<Availability>;
-  create: (options?: {
-    expectedInputs?: Array<{ type: string; languages?: string[] }>;
-    expectedOutputs?: Array<{ type: string; languages?: string[] }>;
-    initialPrompts?: Array<{ role: string; content: string }>;
-    monitor?: (monitor: ModelMonitor) => void;
-  }) => Promise<PromptSession>;
-};
+/**
+ * Single discriminated union replacing availability + isReady + progress + boot error.
+ * Each status is a complete description of the AI's current phase.
+ */
+export type AiPhase =
+  | { status: "checking" }
+  | { status: "unavailable" }
+  | { status: "downloadable"; progress: number }
+  | { status: "downloading"; progress: number }
+  | { status: "ready" }
+  | { status: "error"; error: AiError };
 
 export type SiteHeaderProps = {
   tabs: PortfolioTab[];
@@ -52,30 +32,23 @@ export type SiteHeaderProps = {
   isGenerating: boolean;
   onTabChange: (tab: PortfolioTab) => void;
   onQuestionChange: (question: string) => void;
-  onQuestion: (event: FormEvent<HTMLFormElement>) => void;
+  onQuestion: (event: React.SyntheticEvent<HTMLFormElement>) => void;
   onSuggestionSelect: (question: string) => void;
   onStop: () => void;
   onReset: () => void;
 };
 
 export type CanvasAreaProps = {
-  isReady: boolean;
-  isGenerating: boolean;
-  availability: Availability | "checking";
-  progress: number;
+  phase: AiPhase;
   canvas: string;
-  error: string;
+  isGenerating: boolean;
+  generationError: AiError | null;
   onDismissError: () => void;
+  onReset: () => void;
 };
 
 export type ErrorFallbackProps = {
-  availability: Availability | "checking";
-  progress: number;
-  error: string;
+  phase: AiPhase;
+  onDismissError: () => void;
+  onReset: () => void;
 };
-
-declare global {
-  interface Window {
-    LanguageModel?: LanguageModelApi;
-  }
-}

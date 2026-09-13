@@ -285,6 +285,22 @@ button:focus-visible {
 .error-message {
   color: var(--coral) !important;
 }
+.error-container {
+  display: grid;
+  gap: 16px;
+}
+.error-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.error-actions .ui-button {
+  border: 1px solid var(--ink);
+  padding: 8px 14px;
+  font: 11px var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
 .landing-canvas {
   min-height: 54vh;
   padding-top: 15vh;

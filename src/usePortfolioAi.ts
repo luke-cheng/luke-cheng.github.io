@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import DOMPurify from "dompurify";
-import type { Availability, PortfolioTab, PromptSession } from "./types";
+import type { AiError, AiPhase, PortfolioTab } from "./types";
 
-const modelOptions = {
+// ─── Constants ───────────────────────────────────────────────────────────────
+
+const MODEL_OPTIONS: LanguageModelCreateCoreOptions = {
   expectedInputs: [{ type: "text", languages: ["en"] }],
   expectedOutputs: [{ type: "text", languages: ["en"] }],
 };
-const tabSchema = {
+
+const TAB_SCHEMA = {
   type: "object",
   properties: {
     tabs: {
@@ -26,7 +29,8 @@ const tabSchema = {
   },
   required: ["tabs"],
 };
-const suggestionsSchema = {
+
+const SUGGESTIONS_SCHEMA = {
   type: "object",
   properties: {
     questions: {
@@ -38,7 +42,8 @@ const suggestionsSchema = {
   },
   required: ["questions"],
 };
-const fallbackTabs: PortfolioTab[] = [
+
+const FALLBACK_TABS: PortfolioTab[] = [
   {
     id: "systems",
     label: "Systems at scale",
@@ -47,8 +52,7 @@ const fallbackTabs: PortfolioTab[] = [
   {
     id: "experiments",
     label: "Side experiments",
-    prompt:
-      "Focus on personal projects, product work, and technical curiosity.",
+    prompt: "Focus on personal projects, product work, and technical curiosity.",
   },
   {
     id: "outside",
@@ -56,8 +60,10 @@ const fallbackTabs: PortfolioTab[] = [
     prompt: "Focus on leadership, interests, and the ideas behind the work.",
   },
 ];
-const fallbackCanvas = `<article class="landing-canvas"><p class="eyebrow">Luke's website</p><h1>Pick a tab above.</h1><p>generously generate by your on-device AI</p></article>`;
-const systemPrompt = `You are the local portfolio editor for Luke Cheng. The complete source of truth is the portfolio markdown supplied below. Never invent facts, companies, dates, metrics, technologies, links, or responsibilities. You may make the presentation surprising and editorial, but every factual claim must be traceable to the source.
+
+const FALLBACK_CANVAS = `<article class="landing-canvas"><p class="eyebrow">Luke's website</p><h1>Pick a tab above.</h1><p>generously generate by your on-device AI</p></article>`;
+
+const SYSTEM_PROMPT = `You are the local portfolio editor for Luke Cheng. The complete source of truth is the portfolio markdown supplied below. Never invent facts, companies, dates, metrics, technologies, links, or responsibilities. You may make the presentation surprising and editorial, but every factual claim must be traceable to the source.
 
 For canvas requests, return only semantic HTML and inline style attributes for layout. Make the composition feel like a thoughtful personal website, not a generic resume.
 
@@ -66,172 +72,184 @@ Structure every canvas response in a concise conversation flow.
 Portfolio source:
 `;
 
-function getErrorMessage(error: unknown) {
-  return error instanceof Error ? error.message : String(error);
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function toAiError(error: unknown): AiError {
+  if (error instanceof Error) {
+    return { name: error.name, message: error.message };
+  }
+  return { name: "Error", message: String(error) };
 }
 
-function getStatusLabel(
-  availability: Availability | "checking",
-  isReady: boolean,
-) {
-  if (availability === "checking") return "Checking local model";
-  if (availability === "available") {
-    return isReady ? "Chrome on-device AI ready" : "Waking up on-device AI";
+function getStatusLabel(phase: AiPhase, isGenerating: boolean): string {
+  switch (phase.status) {
+    case "checking":      return "Checking local model";
+    case "downloadable":  return "Preparing local model download";
+    case "downloading":   return "Downloading local model";
+    case "unavailable":   return "Chrome AI unavailable";
+    case "error":         return "Chrome AI setup failed";
+    case "ready":         return isGenerating ? "Generating…" : "Chrome on-device AI ready";
   }
-  if (availability === "downloadable") {
-    return "Preparing local model download";
-  }
-  if (availability === "downloading") return "Downloading local model";
-  return "Chrome AI unavailable";
 }
 
-function sanitizeCanvas(html: string) {
+const SANITIZE_CONFIG = {
+  ALLOWED_TAGS: [
+    "article", "aside", "div", "section", "header",
+    "h1", "h2", "h3", "p", "ul", "ol", "li",
+    "a", "strong", "em", "small", "time",
+    "dl", "dt", "dd", "br",
+  ],
+  ALLOWED_ATTR: ["class", "href", "target", "rel", "style"],
+  FORBID_ATTR: ["onclick", "onload", "onerror"],
+  RETURN_DOM: false as const,
+  RETURN_DOM_FRAGMENT: false as const,
+};
+
+function sanitizeCanvas(html: string): string {
   const withoutFences = html
     .replace(/^\s*```(?:html)?\s*/i, "")
     .replace(/\s*```\s*$/i, "");
-  return DOMPurify.sanitize(withoutFences, {
-    ALLOWED_TAGS: [
-      "article",
-      "aside",
-      "div",
-      "section",
-      "header",
-      "h1",
-      "h2",
-      "h3",
-      "p",
-      "ul",
-      "ol",
-      "li",
-      "a",
-      "strong",
-      "em",
-      "small",
-      "time",
-      "dl",
-      "dt",
-      "dd",
-      "br",
-    ],
-    ALLOWED_ATTR: ["class", "href", "target", "rel", "style"],
-    FORBID_ATTR: ["onclick", "onload", "onerror"],
-  });
+  return DOMPurify.sanitize(withoutFences, SANITIZE_CONFIG) as string;
 }
 
+// ─── Hook ────────────────────────────────────────────────────────────────────
+
 export function usePortfolioAi() {
-  const [tabs, setTabs] = useState(fallbackTabs);
-  const [activeTab, setActiveTab] = useState(fallbackTabs[0].id);
-  const [canvas, setCanvas] = useState(fallbackCanvas);
+  const [phase, setPhase] = useState<AiPhase>({ status: "checking" });
+  const [tabs, setTabs] = useState(FALLBACK_TABS);
+  const [activeTab, setActiveTab] = useState(FALLBACK_TABS[0].id);
+  const [canvas, setCanvas] = useState(FALLBACK_CANVAS);
   const [question, setQuestion] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [availability, setAvailability] = useState<Availability | "checking">(
-    "checking",
-  );
-  const [isReady, setIsReady] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [error, setError] = useState("");
-  const sessionRef = useRef<PromptSession | null>(null);
-  const generationSessionRef = useRef<PromptSession | null>(null);
+  const [generationError, setGenerationError] = useState<AiError | null>(null);
+
+  const sessionRef = useRef<LanguageModel | null>(null);
+  const generationSessionRef = useRef<LanguageModel | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const generationIdRef = useRef(0);
+
+  const isReady = phase.status === "ready";
 
   useEffect(() => {
     let cancelled = false;
 
     const createSession = async (source: string, refreshWhenReady = false) => {
-      if (!window.LanguageModel) return;
+      if (typeof LanguageModel === "undefined") return;
+
+      let session: LanguageModel;
       try {
-        const session = await window.LanguageModel.create({
-          ...modelOptions,
+        session = await LanguageModel.create({
+          ...MODEL_OPTIONS,
           initialPrompts: [
-            { role: "system", content: `${systemPrompt}\n${source}` },
+            { role: "system", content: `${SYSTEM_PROMPT}\n${source}` },
           ],
           monitor: (monitor) =>
-            monitor.addEventListener("downloadprogress", (event) =>
-              setProgress(event.loaded),
+            monitor.addEventListener("downloadprogress", (e) =>
+              setPhase({ status: "downloading", progress: e.loaded }),
             ),
         });
-        if (cancelled) {
-          session.destroy();
-          return;
-        }
-        sessionRef.current = session;
-        setIsReady(true);
-        setAvailability("available");
-        if (refreshWhenReady) {
-          window.location.reload();
-          return;
-        }
-        const tabSession = await session.clone();
-        try {
-          const result = await tabSession.prompt(
-            "Create exactly three concise navigation tabs for this portfolio. Return JSON matching the requested schema.",
-            { responseConstraint: tabSchema },
-          );
-          const parsed = JSON.parse(result) as { tabs?: PortfolioTab[] };
-          if (!cancelled && parsed.tabs?.length === 3) setTabs(parsed.tabs);
-        } finally {
-          tabSession.destroy();
-        }
-        const suggestionSession = await session.clone();
-        try {
-          const result = await suggestionSession.prompt(
-            "Create 2 to 5 concise generic one sentence questions a visitor might ask about this portfolio. Return JSON matching the requested schema.",
-            { responseConstraint: suggestionsSchema },
-          );
-          const parsed = JSON.parse(result) as { questions?: unknown[] };
-          const generatedSuggestions = parsed.questions
-            ?.filter((item): item is string => typeof item === "string")
-            .map((item) => item.trim())
-            .filter(Boolean)
-            .slice(0, 4);
-          if (!cancelled && generatedSuggestions?.length) {
-            setSuggestions(generatedSuggestions);
-          }
-        } catch (suggestionError) {
-          console.error(suggestionError);
-        } finally {
-          suggestionSession.destroy();
-        }
-      } catch (error) {
-        console.error(error);
-        if (!cancelled) setError(getErrorMessage(error));
+      } catch (err) {
+        console.error(err);
+        setPhase({ status: "error", error: toAiError(err) });
+        return;
+      }
+
+      if (cancelled) {
+        session.destroy();
+        return;
+      }
+
+      sessionRef.current = session;
+      setPhase({ status: "ready" });
+
+      if (refreshWhenReady) {
+        window.location.reload();
+        return;
+      }
+
+      // Generate tabs
+      const tabSession = await session.clone();
+      try {
+        const result = await tabSession.prompt(
+          "Create exactly three concise navigation tabs for this portfolio. Return JSON matching the requested schema.",
+          { responseConstraint: TAB_SCHEMA },
+        );
+        const parsed = JSON.parse(result) as { tabs?: PortfolioTab[] };
+        if (!cancelled && parsed.tabs?.length === 3) setTabs(parsed.tabs);
+      } catch (err) {
+        console.error("Tab generation failed:", err);
+      } finally {
+        tabSession.destroy();
+      }
+
+      // Generate suggestions
+      const suggestionSession = await session.clone();
+      try {
+        const result = await suggestionSession.prompt(
+          "Create 2 to 5 concise generic one sentence questions a visitor might ask about this portfolio. Return JSON matching the requested schema.",
+          { responseConstraint: SUGGESTIONS_SCHEMA },
+        );
+        const parsed = JSON.parse(result) as { questions?: unknown[] };
+        const generated = parsed.questions
+          ?.filter((item): item is string => typeof item === "string")
+          .map((item) => item.trim())
+          .filter(Boolean)
+          .slice(0, 4);
+        if (!cancelled && generated?.length) setSuggestions(generated);
+      } catch (err) {
+        console.error("Suggestion generation failed:", err);
+      } finally {
+        suggestionSession.destroy();
       }
     };
 
     const boot = async () => {
+      // If the API doesn't exist at all, show "browser not supported" immediately.
+      if (typeof LanguageModel === "undefined") {
+        setPhase({ status: "unavailable" });
+        return;
+      }
+
       try {
         const [source, status] = await Promise.all([
-          fetch("/portfolio.md").then((response) => {
-            if (!response.ok) {
-              throw new Error("The portfolio could not be loaded.");
-            }
-            return response.text();
+          fetch("/portfolio.md").then((r) => {
+            if (!r.ok) throw new Error("The portfolio could not be loaded.");
+            return r.text();
           }),
-          window.LanguageModel?.availability(modelOptions) ??
-            Promise.resolve("unavailable" as const),
+          LanguageModel.availability(MODEL_OPTIONS),
         ]);
+
         if (cancelled) return;
-        setAvailability(status);
+
         switch (status) {
           case "available":
+            setPhase({ status: "checking" });
             await createSession(source);
             break;
           case "downloadable":
+            setPhase({ status: "downloadable", progress: 0 });
+            await createSession(source, true);
+            break;
           case "downloading":
+            setPhase({ status: "downloading", progress: 0 });
             await createSession(source, true);
             break;
           case "unavailable":
+            // API exists but availability() says the device can't run it.
+            // Attempt create() anyway so Chrome throws the real error with
+            // the actual reason (disk space, VRAM, etc.) rather than us guessing.
+            await createSession(source);
             break;
         }
-      } catch (error) {
-        console.error(error);
-        if (!cancelled) setError(getErrorMessage(error));
+      } catch (err) {
+        console.error(err);
+        setPhase({ status: "error", error: toAiError(err) });
       }
     };
 
     void boot();
+
     return () => {
       cancelled = true;
       generationIdRef.current += 1;
@@ -244,47 +262,55 @@ export function usePortfolioAi() {
   const generateCanvas = async (tab: PortfolioTab, requestedQuestion = "") => {
     const mainSession = sessionRef.current;
     if (!mainSession) return;
-    const generationId = generationIdRef.current + 1;
-    generationIdRef.current = generationId;
+
+    const generationId = ++generationIdRef.current;
     abortRef.current?.abort();
     generationSessionRef.current?.destroy();
+
     const controller = new AbortController();
     abortRef.current = controller;
+
     setIsGenerating(true);
-    setError("");
+    setGenerationError(null);
+
+    let session: LanguageModel | null = null;
     let output = "";
-    let session: PromptSession | null = null;
+
     try {
       session = await mainSession.clone();
+
       if (generationId !== generationIdRef.current) {
         session.destroy();
         return;
       }
+
       generationSessionRef.current = session;
+
       const request = requestedQuestion
-        ? `Answer the visitor's question directly: “${requestedQuestion}” Use the portfolio source as your only evidence. The selected lens is “${tab.label}”, which may influence emphasis but must not turn the answer into a generic resume. Explain the relevant connections, reasoning, or tradeoffs when the source supports them. Do not merely list experience. Present the answer as a thoughtful, focused portfolio canvas in semantic HTML. Return semantic HTML only.`
-        : `Compose the main portfolio canvas for the view “${tab.label}”. ${tab.prompt} Use a clear hierarchy, one unusual but usable layout, and only facts from the source. Return semantic HTML only.`;
-      for await (const chunk of session.promptStreaming(request, {
-        signal: controller.signal,
-      })) {
-        if (generationId !== generationIdRef.current) return;
-        output += chunk;
-        setCanvas(sanitizeCanvas(output));
+        ? `Answer the visitor's question directly: "${requestedQuestion}" Use the portfolio source as your only evidence. The selected lens is "${tab.label}", which may influence emphasis but must not turn the answer into a generic resume. Explain the relevant connections, reasoning, or tradeoffs when the source supports them. Do not merely list experience. Present the answer as a thoughtful, focused portfolio canvas in semantic HTML. Return semantic HTML only.`
+        : `Compose the main portfolio canvas for the view "${tab.label}". ${tab.prompt} Use a clear hierarchy, one unusual but usable layout, and only facts from the source. Return semantic HTML only.`;
+
+      const stream = session.promptStreaming(request, { signal: controller.signal });
+      const reader = stream.getReader();
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          if (generationId !== generationIdRef.current) return;
+          output += value;
+          setCanvas(sanitizeCanvas(output));
+        }
+      } finally {
+        reader.releaseLock();
       }
-    } catch (generationError) {
-      if (
-        generationId === generationIdRef.current &&
-        (generationError as Error).name !== "AbortError"
-      ) {
-        console.error(generationError);
-        setError(getErrorMessage(generationError));
+    } catch (err) {
+      if (generationId === generationIdRef.current && (err as Error).name !== "AbortError") {
+        console.error(err);
+        setGenerationError(toAiError(err));
       }
     } finally {
       session?.destroy();
-      if (
-        generationId === generationIdRef.current &&
-        generationSessionRef.current === session
-      ) {
+      if (generationId === generationIdRef.current && generationSessionRef.current === session) {
         generationSessionRef.current = null;
         setIsGenerating(false);
       }
@@ -295,46 +321,44 @@ export function usePortfolioAi() {
     setActiveTab(tab.id);
     void generateCanvas(tab);
   };
-  const handleQuestion = (event: React.FormEvent<HTMLFormElement>) => {
+
+  const handleQuestion = (event: React.SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const trimmedQuestion = question.trim();
-    if (!trimmedQuestion) return;
+    const trimmed = question.trim();
+    if (!trimmed) return;
     if (!isReady) {
-      setError(
-        "On-device AI is not ready yet. Your question is ready when Chrome AI becomes available.",
-      );
+      setGenerationError({ name: "Error", message: "On-device AI is not ready yet. Try again once Chrome AI becomes available." });
       return;
     }
     setQuestion("");
-    const tab = tabs.find((item) => item.id === activeTab) ?? tabs[0];
-    void generateCanvas(tab, trimmedQuestion);
+    const tab = tabs.find((t) => t.id === activeTab) ?? tabs[0];
+    void generateCanvas(tab, trimmed);
   };
-  const handleSuggestionSelect = (selectedQuestion: string) => {
+
+  const handleSuggestionSelect = (selected: string) => {
     if (!isReady || isGenerating) return;
     setQuestion("");
-    const tab = tabs.find((item) => item.id === activeTab) ?? tabs[0];
-    void generateCanvas(tab, selectedQuestion);
+    const tab = tabs.find((t) => t.id === activeTab) ?? tabs[0];
+    void generateCanvas(tab, selected);
   };
-  const statusLabel = getStatusLabel(availability, isReady);
 
   return {
+    phase,
     tabs,
     activeTab,
+    canvas,
     question,
     suggestions,
-    statusLabel,
     isReady,
     isGenerating,
-    availability,
-    progress,
-    canvas,
-    error,
+    generationError,
+    statusLabel: getStatusLabel(phase, isGenerating),
     onTabChange: handleTabChange,
     onQuestionChange: setQuestion,
     onQuestion: handleQuestion,
     onSuggestionSelect: handleSuggestionSelect,
     onStop: () => abortRef.current?.abort(),
     onReset: () => window.location.reload(),
-    onDismissError: () => setError(""),
+    onDismissError: () => setGenerationError(null),
   };
 }

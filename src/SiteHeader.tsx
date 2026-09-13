@@ -56,7 +56,7 @@ function SiteHeader({
             placeholder={
               isReady
                 ? "Ask me anything..."
-                : "Preparing on-device..."
+                : "Preparing on-device AI..."
             }
             aria-label="Ask the portfolio a question"
             disabled={!isReady || isGenerating}
