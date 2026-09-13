@@ -23,7 +23,7 @@ const STATUS_MESSAGES = {
   },
 } as const;
 
-function ErrorFallback({ phase, onReset }: ErrorFallbackProps) {
+function ErrorFallback({ phase, compact = false, onReset }: ErrorFallbackProps) {
   const { heading, description } = STATUS_MESSAGES[phase.status as keyof typeof STATUS_MESSAGES]
     ?? STATUS_MESSAGES.unavailable;
 
@@ -33,7 +33,7 @@ function ErrorFallback({ phase, onReset }: ErrorFallbackProps) {
     : null;
 
   return (
-    <section className="ai-gate" aria-live="polite">
+    <section className={`ai-gate${compact ? " ai-gate--compact" : ""}`} aria-live="polite">
       <span className="eyebrow">Notice</span>
       <h2>{heading}</h2>
       <p>{description}</p>

@@ -42,21 +42,19 @@ button:focus-visible {
 }
 .ui-button {
   --button-color: var(--ink);
-  border: 0px;
+  border: 0;
   background: transparent;
   color: var(--button-color);
   transition:
-    border-color 0.2s ease,
-    background-color 0.2s ease,
-    color 0.2s ease,
-    opacity 0.2s ease;
+    color 0.15s ease,
+    opacity 0.15s ease;
 }
 .ui-button:hover,
 .ui-button:focus-visible {
-  border-color: var(--coral);
   color: var(--coral);
 }
 .ui-button:focus-visible {
+  outline: 2px solid var(--coral);
   outline-offset: 2px;
 }
 .ui-button:disabled {
@@ -65,8 +63,6 @@ button:focus-visible {
 }
 .ui-button:disabled:hover,
 .ui-button:disabled:focus-visible {
-  border-color: transparent;
-  background: transparent;
   color: var(--button-color);
 }
 .site-shell {
@@ -144,9 +140,12 @@ button:focus-visible {
   max-width: none;
 }
 .prompt-symbol {
+  display: flex;
+  align-items: center;
   color: var(--coral);
-  font: 24px var(--serif);
+  font-size: 22px;
   padding-right: 10px;
+  line-height: 1;
 }
 .question-bar input {
   flex: 1;
@@ -194,21 +193,18 @@ button:focus-visible {
   width: 34px;
   height: 34px;
   place-items: center;
-  font: 20px/1 var(--mono);
+  font-size: 20px;
+  line-height: 1;
 }
 .ui-button--stop {
   --button-color: var(--coral);
   color: var(--coral);
-  font: 24px/1 var(--sans);
 }
 .ui-button--submit {
-  color: var(--ink);
+  color: var(--muted);
 }
-.ui-button--submit:hover,
-.ui-button--submit:focus-visible,
-.ui-button--stop:hover,
-.ui-button--stop:focus-visible {
-  color: var(--coral);
+.ui-button--submit:disabled {
+  color: var(--muted);
 }
 .tab-nav {
   display: flex;
@@ -238,6 +234,8 @@ button:focus-visible {
 }
 .canvas-wrap {
   position: relative;
+}
+.generated-canvas-wrap {
   padding: 112px 0 80px;
 }
 .ai-gate {
@@ -245,12 +243,17 @@ button:focus-visible {
   align-content: center;
   justify-items: start;
   gap: 20px;
-  min-height: calc(100svh - 230px);
-  margin-bottom: 0;
-  padding: 7vh 8vw;
+  min-height: calc(100svh - 200px);
+  padding: 0 8vw;
   border-bottom: 1px solid var(--line);
   color: var(--muted);
   font-size: 15px;
+}
+/* Compact variant: download notice shown above the canvas while page is usable */
+.ai-gate--compact {
+  min-height: unset;
+  padding: 36px 0 32px;
+  margin-bottom: 48px;
 }
 .ai-gate h2 {
   max-width: 900px;
@@ -295,11 +298,16 @@ button:focus-visible {
   flex-wrap: wrap;
 }
 .error-actions .ui-button {
-  border: 1px solid var(--ink);
+  border: 1px solid var(--line);
   padding: 8px 14px;
   font: 11px var(--mono);
   text-transform: uppercase;
   letter-spacing: 0.06em;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.error-actions .ui-button:hover,
+.error-actions .ui-button:focus-visible {
+  border-color: var(--coral);
 }
 .landing-canvas {
   min-height: 54vh;
@@ -322,6 +330,11 @@ button:focus-visible {
 .generated-canvas {
   min-height: 520px;
   transition: opacity 0.25s ease;
+}
+.generated-canvas.canvas-pending {
+  opacity: 0.35;
+  pointer-events: none;
+  user-select: none;
 }
 .canvas-intro {
   max-width: 900px;
@@ -448,10 +461,15 @@ button:focus-visible {
   display: flex;
   gap: 18px;
   white-space: nowrap;
+  font-size: 20px;
+  line-height: 1;
 }
 .site-footer a {
-  color: var(--ink);
+  display: flex;
+  align-items: center;
+  color: var(--muted);
   text-decoration: none;
+  transition: color 0.15s ease;
 }
 .site-footer a:hover {
   color: var(--coral);
@@ -488,12 +506,12 @@ button:focus-visible {
   .tab-nav {
     gap: 20px;
   }
-  .canvas-wrap {
+  .generated-canvas-wrap {
     padding-top: 62px;
   }
   .ai-gate {
-    min-height: calc(100svh - 250px);
-    padding: 8vh 0;
+    min-height: calc(100svh - 220px);
+    padding: 0;
     gap: 16px;
   }
   .progress-track {

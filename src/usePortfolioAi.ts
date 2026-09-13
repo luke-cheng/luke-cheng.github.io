@@ -115,7 +115,7 @@ function sanitizeCanvas(html: string): string {
 // ─── Hook ────────────────────────────────────────────────────────────────────
 
 export function usePortfolioAi() {
-  const [phase, setPhase] = useState<AiPhase>({ status: "checking" });
+  const [phase, setPhase] = useState<AiPhase>({ status: "checking", blocks: false });
   const [tabs, setTabs] = useState(FALLBACK_TABS);
   const [activeTab, setActiveTab] = useState(FALLBACK_TABS[0].id);
   const [canvas, setCanvas] = useState(FALLBACK_CANVAS);
@@ -146,12 +146,12 @@ export function usePortfolioAi() {
           ],
           monitor: (monitor) =>
             monitor.addEventListener("downloadprogress", (e) =>
-              setPhase({ status: "downloading", progress: e.loaded }),
+              setPhase({ status: "downloading", blocks: false, progress: e.loaded }),
             ),
         });
       } catch (err) {
         console.error(err);
-        setPhase({ status: "error", error: toAiError(err) });
+        setPhase({ status: "error", blocks: true, error: toAiError(err) });
         return;
       }
 
@@ -161,7 +161,7 @@ export function usePortfolioAi() {
       }
 
       sessionRef.current = session;
-      setPhase({ status: "ready" });
+      setPhase({ status: "ready", blocks: false });
 
       if (refreshWhenReady) {
         window.location.reload();
@@ -207,7 +207,7 @@ export function usePortfolioAi() {
     const boot = async () => {
       // If the API doesn't exist at all, show "browser not supported" immediately.
       if (typeof LanguageModel === "undefined") {
-        setPhase({ status: "unavailable" });
+        setPhase({ status: "unavailable", blocks: true });
         return;
       }
 
@@ -224,15 +224,15 @@ export function usePortfolioAi() {
 
         switch (status) {
           case "available":
-            setPhase({ status: "checking" });
+            setPhase({ status: "checking", blocks: false });
             await createSession(source);
             break;
           case "downloadable":
-            setPhase({ status: "downloadable", progress: 0 });
+            setPhase({ status: "downloadable", blocks: false, progress: 0 });
             await createSession(source, true);
             break;
           case "downloading":
-            setPhase({ status: "downloading", progress: 0 });
+            setPhase({ status: "downloading", blocks: false, progress: 0 });
             await createSession(source, true);
             break;
           case "unavailable":
@@ -244,7 +244,7 @@ export function usePortfolioAi() {
         }
       } catch (err) {
         console.error(err);
-        setPhase({ status: "error", error: toAiError(err) });
+        setPhase({ status: "error", blocks: true, error: toAiError(err) });
       }
     };
 

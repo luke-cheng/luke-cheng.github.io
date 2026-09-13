@@ -1,8 +1,9 @@
 import type { SiteHeaderProps } from "./types";
 
-import AssistantIcon from "@mui/icons-material/Assistant";
-import CancelScheduleSendIcon from "@mui/icons-material/CancelScheduleSend";
-import SendIcon from "@mui/icons-material/Send";
+import AutoAwesomeOutlinedIcon from "@mui/icons-material/AutoAwesomeOutlined";
+import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
+import StopCircleOutlinedIcon from "@mui/icons-material/StopCircleOutlined";
+
 function SiteHeader({
   tabs,
   activeTab,
@@ -47,8 +48,8 @@ function SiteHeader({
       </div>
       <div className="header-bottom">
         <form className="question-bar" onSubmit={onQuestion}>
-          <span className="prompt-symbol">
-            <AssistantIcon />
+          <span className="prompt-symbol" aria-hidden="true">
+            <AutoAwesomeOutlinedIcon fontSize="inherit" />
           </span>
           <input
             value={question}
@@ -73,9 +74,7 @@ function SiteHeader({
               title="Stop generating"
               onClick={onStop}
             >
-              <span aria-hidden="true">
-                <CancelScheduleSendIcon />
-              </span>
+              <StopCircleOutlinedIcon fontSize="inherit" aria-hidden="true" />
             </button>
           ) : (
             <button
@@ -84,7 +83,7 @@ function SiteHeader({
               aria-label="Ask question"
               disabled={!isReady || !question.trim()}
             >
-              <SendIcon />
+              <SendOutlinedIcon fontSize="inherit" aria-hidden="true" />
             </button>
           )}
         </form>

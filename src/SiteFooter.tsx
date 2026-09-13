@@ -1,6 +1,7 @@
 import GitHubIcon from "@mui/icons-material/GitHub";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import FilePresentIcon from "@mui/icons-material/FilePresent";
+import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+
 function SiteFooter() {
   return (
     <footer className="site-footer">
@@ -13,20 +14,26 @@ function SiteFooter() {
           href="https://github.com/Luke-Cheng"
           target="_blank"
           rel="noreferrer"
+          aria-label="GitHub"
           title="GitHub/Luke-Cheng"
         >
-          <GitHubIcon />
+          <GitHubIcon fontSize="inherit" aria-hidden="true" />
         </a>
         <a
           href="https://www.linkedin.com/in/luke-cheng/"
           target="_blank"
           rel="noreferrer"
+          aria-label="LinkedIn"
           title="In/Luke-Cheng"
         >
-          <LinkedInIcon />
+          <LinkedInIcon fontSize="inherit" aria-hidden="true" />
         </a>
-        <a href="/?page=portfolio" title="Luke-Cheng-Resume.md">
-          <FilePresentIcon />
+        <a
+          href="/?page=portfolio"
+          aria-label="Resume"
+          title="Luke-Cheng-Resume.md"
+        >
+          <DescriptionOutlinedIcon fontSize="inherit" aria-hidden="true" />
         </a>
       </div>
     </footer>
