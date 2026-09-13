@@ -46,12 +46,14 @@ export type SiteHeaderProps = {
   tabs: PortfolioTab[];
   activeTab: string;
   question: string;
+  suggestions: string[];
   statusLabel: string;
   isReady: boolean;
   isGenerating: boolean;
   onTabChange: (tab: PortfolioTab) => void;
   onQuestionChange: (question: string) => void;
   onQuestion: (event: FormEvent<HTMLFormElement>) => void;
+  onSuggestionSelect: (question: string) => void;
   onStop: () => void;
   onReset: () => void;
 };

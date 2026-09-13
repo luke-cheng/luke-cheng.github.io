@@ -1,10 +1,6 @@
 import type { ErrorFallbackProps } from "./types";
 
-function ErrorFallback({
-  availability,
-  progress,
-  error,
-}: ErrorFallbackProps) {
+function ErrorFallback({ availability, progress, error }: ErrorFallbackProps) {
   const isDownloading =
     availability === "downloadable" || availability === "downloading";
   const messages = {

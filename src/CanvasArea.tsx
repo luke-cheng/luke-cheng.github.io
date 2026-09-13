@@ -28,8 +28,12 @@ function CanvasArea({
       )}
       {error && isReady && (
         <div className="inline-error">
-          {error}{" "}
-          <button type="button" onClick={onDismissError}>
+          {error}
+          <button
+            className="ui-button ui-button--inline"
+            type="button"
+            onClick={onDismissError}
+          >
             Dismiss
           </button>
         </div>

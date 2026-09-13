@@ -19,7 +19,7 @@ We're building an experimental personal portfolio powered by Chrome's built-in P
 
 ### 2. Theme Engine
 
-- Prompt the local AI on page load to generate a JSON map of CSS variables (e.g., `--bg`, `--text`, `--accent`, `--layout-gap`) derived from `portfolio.md`.
+- Prompt the on-device AI on page load to generate a JSON map of CSS variables (e.g., `--bg`, `--text`, `--accent`, `--layout-gap`) derived from `portfolio.md`.
 - Inject these CSS variables directly into `<style id="theme">` on `document.head`.
 
 ### 3. Header & Navigation
@@ -37,4 +37,4 @@ We're building an experimental personal portfolio powered by Chrome's built-in P
 
 ### 5. Static Footer
 
-- Fixed footer displaying something alone: _"Content and layout dynamically generated via Your Browser's Local AI. So be careful with navigating as it'll trigger a regenerate."_ With icons to github, to linkedin, and to `/public/portfolio.md` for users to view the raw content.
+- Fixed footer displaying something alone: _"Content and layout dynamically generated via Your Browser's on-device AI. So be careful with navigating as it'll trigger a regenerate."_ With icons to github, to linkedin, and to `/public/portfolio.md` for users to view the raw content.

@@ -26,6 +26,18 @@ const tabSchema = {
   },
   required: ["tabs"],
 };
+const suggestionsSchema = {
+  type: "object",
+  properties: {
+    questions: {
+      type: "array",
+      minItems: 2,
+      maxItems: 4,
+      items: { type: "string", minLength: 12, maxLength: 100 },
+    },
+  },
+  required: ["questions"],
+};
 const fallbackTabs: PortfolioTab[] = [
   {
     id: "systems",
@@ -44,7 +56,7 @@ const fallbackTabs: PortfolioTab[] = [
     prompt: "Focus on leadership, interests, and the ideas behind the work.",
   },
 ];
-const fallbackCanvas = `<article class="landing-canvas"><p class="eyebrow">Luke's website</p><h1>Click a tab above.</h1><p>And get your on-device AI to generate this site.</p></article>`;
+const fallbackCanvas = `<article class="landing-canvas"><p class="eyebrow">Luke's website</p><h1>Pick a tab above.</h1><p>generously generate by your on-device AI</p></article>`;
 const systemPrompt = `You are the local portfolio editor for Luke Cheng. The complete source of truth is the portfolio markdown supplied below. Never invent facts, companies, dates, metrics, technologies, links, or responsibilities. You may make the presentation surprising and editorial, but every factual claim must be traceable to the source.
 
 For canvas requests, return only semantic HTML and inline style attributes for layout. Make the composition feel like a thoughtful personal website, not a generic resume.
@@ -64,7 +76,7 @@ function getStatusLabel(
 ) {
   if (availability === "checking") return "Checking local model";
   if (availability === "available") {
-    return isReady ? "Local AI ready" : "Waking up local AI";
+    return isReady ? "Chrome on-device AI ready" : "Waking up on-device AI";
   }
   if (availability === "downloadable") {
     return "Preparing local model download";
@@ -111,6 +123,7 @@ export function usePortfolioAi() {
   const [activeTab, setActiveTab] = useState(fallbackTabs[0].id);
   const [canvas, setCanvas] = useState(fallbackCanvas);
   const [question, setQuestion] = useState("");
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [availability, setAvailability] = useState<Availability | "checking">(
     "checking",
   );
@@ -160,6 +173,26 @@ export function usePortfolioAi() {
           if (!cancelled && parsed.tabs?.length === 3) setTabs(parsed.tabs);
         } finally {
           tabSession.destroy();
+        }
+        const suggestionSession = await session.clone();
+        try {
+          const result = await suggestionSession.prompt(
+            "Create 2 to 5 concise generic one sentence questions a visitor might ask about this portfolio. Return JSON matching the requested schema.",
+            { responseConstraint: suggestionsSchema },
+          );
+          const parsed = JSON.parse(result) as { questions?: unknown[] };
+          const generatedSuggestions = parsed.questions
+            ?.filter((item): item is string => typeof item === "string")
+            .map((item) => item.trim())
+            .filter(Boolean)
+            .slice(0, 4);
+          if (!cancelled && generatedSuggestions?.length) {
+            setSuggestions(generatedSuggestions);
+          }
+        } catch (suggestionError) {
+          console.error(suggestionError);
+        } finally {
+          suggestionSession.destroy();
         }
       } catch (error) {
         console.error(error);
@@ -268,7 +301,7 @@ export function usePortfolioAi() {
     if (!trimmedQuestion) return;
     if (!isReady) {
       setError(
-        "Local AI is not ready yet. Your question is ready when Chrome AI becomes available.",
+        "On-device AI is not ready yet. Your question is ready when Chrome AI becomes available.",
       );
       return;
     }
@@ -276,12 +309,19 @@ export function usePortfolioAi() {
     const tab = tabs.find((item) => item.id === activeTab) ?? tabs[0];
     void generateCanvas(tab, trimmedQuestion);
   };
+  const handleSuggestionSelect = (selectedQuestion: string) => {
+    if (!isReady || isGenerating) return;
+    setQuestion("");
+    const tab = tabs.find((item) => item.id === activeTab) ?? tabs[0];
+    void generateCanvas(tab, selectedQuestion);
+  };
   const statusLabel = getStatusLabel(availability, isReady);
 
   return {
     tabs,
     activeTab,
     question,
+    suggestions,
     statusLabel,
     isReady,
     isGenerating,
@@ -292,6 +332,7 @@ export function usePortfolioAi() {
     onTabChange: handleTabChange,
     onQuestionChange: setQuestion,
     onQuestion: handleQuestion,
+    onSuggestionSelect: handleSuggestionSelect,
     onStop: () => abortRef.current?.abort(),
     onReset: () => window.location.reload(),
     onDismissError: () => setError(""),

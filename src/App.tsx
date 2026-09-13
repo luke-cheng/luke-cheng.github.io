@@ -13,12 +13,14 @@ function App() {
         tabs={ai.tabs}
         activeTab={ai.activeTab}
         question={ai.question}
+        suggestions={ai.suggestions}
         statusLabel={ai.statusLabel}
         isReady={ai.isReady}
         isGenerating={ai.isGenerating}
         onTabChange={ai.onTabChange}
         onQuestionChange={ai.onQuestionChange}
         onQuestion={ai.onQuestion}
+        onSuggestionSelect={ai.onSuggestionSelect}
         onStop={ai.onStop}
         onReset={ai.onReset}
       />
