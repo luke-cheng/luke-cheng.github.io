@@ -1,5 +1,6 @@
 import "./App.css";
 import CanvasArea from "./CanvasArea";
+import ErrorFallback from "./ErrorFallback";
 import SiteFooter from "./SiteFooter";
 import SiteHeader from "./SiteHeader";
 import { usePortfolioAi } from "./usePortfolioAi";
@@ -24,14 +25,27 @@ function App() {
         onStop={ai.onStop}
         onReset={ai.onReset}
       />
-      <CanvasArea
-        phase={ai.phase}
-        canvas={ai.canvas}
-        isGenerating={ai.isGenerating}
-        generationError={ai.generationError}
-        onDismissError={ai.onDismissError}
-        onReset={ai.onReset}
-      />
+      {ai.phase.status === "ready" ? (
+        <>
+          <CanvasArea canvas={ai.canvas} isGenerating={ai.isGenerating} />
+          {ai.generationError && (
+            <div className="inline-error" role="alert">
+              <strong>{ai.generationError.name}:</strong> {ai.generationError.message}
+              <button
+                className="ui-button ui-button--inline"
+                type="button"
+                onClick={ai.onDismissError}
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
+        </>
+      ) : (
+        <main className="canvas-wrap">
+          <ErrorFallback phase={ai.phase} onReset={ai.onReset} />
+        </main>
+      )}
       <SiteFooter />
     </div>
   );
