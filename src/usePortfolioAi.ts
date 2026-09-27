@@ -61,7 +61,7 @@ const FALLBACK_TABS: PortfolioTab[] = [
   },
 ];
 
-const FALLBACK_CANVAS = `<article class="landing-canvas"><p class="eyebrow">Luke's website</p><h1>Pick a tab above.</h1><p>generously generate by your on-device AI</p></article>`;
+const FALLBACK_CANVAS = `<article class="landing-canvas"><p class="eyebrow">Luke Cheng</p><h1>Software engineer, systems thinker, and builder.</h1><p>Explore Luke's work through the three tabs above, or ask a question to focus the portfolio on what you want to know.</p></article>`;
 
 const SYSTEM_PROMPT = `You are the local portfolio editor for Luke Cheng. The complete source of truth is the portfolio markdown supplied below. Never invent facts, companies, dates, metrics, technologies, links, or responsibilities. You may make the presentation surprising and editorial, but every factual claim must be traceable to the source.
 
