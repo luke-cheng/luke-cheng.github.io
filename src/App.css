@@ -249,12 +249,6 @@ button:focus-visible {
   color: var(--muted);
   font-size: 15px;
 }
-/* Compact variant: download notice shown above the canvas while page is usable */
-.ai-gate--compact {
-  min-height: unset;
-  padding: 36px 0 32px;
-  margin-bottom: 48px;
-}
 .ai-gate h2 {
   max-width: 900px;
   margin: 0;
@@ -330,11 +324,6 @@ button:focus-visible {
 .generated-canvas {
   min-height: 520px;
   transition: opacity 0.25s ease;
-}
-.generated-canvas.canvas-pending {
-  opacity: 0.35;
-  pointer-events: none;
-  user-select: none;
 }
 .canvas-intro {
   max-width: 900px;

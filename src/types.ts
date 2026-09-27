@@ -10,20 +10,16 @@ export type AiError = {
   message: string;
 };
 
-/**
- * Single discriminated union replacing availability + isReady + progress + boot error.
- * Each status is a complete description of the AI's current phase.
- *
- * `blocks: true` — canvas cannot be shown, show full-page gate instead.
- * `blocks: false` — canvas is visible; phase may still show a notice banner.
- */
+/** A complete description of the on-device AI setup phase. */
 export type AiPhase =
-  | { status: "checking";     blocks: false }
-  | { status: "unavailable";  blocks: true }
-  | { status: "downloadable"; blocks: false; progress: number }
-  | { status: "downloading";  blocks: false; progress: number }
-  | { status: "ready";        blocks: false }
-  | { status: "error";        blocks: true; error: AiError };
+  | { status: "checking" }
+  | { status: "unavailable" }
+  | { status: "downloadable"; progress: number }
+  | { status: "downloading"; progress: number }
+  | { status: "ready" }
+  | { status: "error"; error: AiError };
+
+export type AiUnavailablePhase = Exclude<AiPhase, { status: "ready" }>;
 
 export type SiteHeaderProps = {
   tabs: PortfolioTab[];
@@ -42,17 +38,11 @@ export type SiteHeaderProps = {
 };
 
 export type CanvasAreaProps = {
-  phase: AiPhase;
   canvas: string;
   isGenerating: boolean;
-  generationError: AiError | null;
-  onDismissError: () => void;
-  onReset: () => void;
 };
 
 export type ErrorFallbackProps = {
-  phase: AiPhase;
-  compact?: boolean;
-  onDismissError: () => void;
+  phase: AiUnavailablePhase;
   onReset: () => void;
 };
