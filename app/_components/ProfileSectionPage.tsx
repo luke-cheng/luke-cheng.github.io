@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import GenerationNotice from "./GenerationNotice";
 import type { ProfilePage } from "../_lib/profile.server";
 import { renderMarkdown } from "../_lib/markdown";
 import { MARKDOWN_SANITIZER, sanitizeHtml } from "../_lib/html-sanitizer";
@@ -61,9 +62,10 @@ function ProfileSectionPage({ page, source, staticHtml }: ProfileSectionPageProp
       <p className="eyebrow">{title}</p>
       <h1>{intro}</h1>
       {isGenerating && (
-        <p className="profile-ai-note" role="status">
-          Tailoring this page locally while the static profile remains available.
-        </p>
+        <GenerationNotice
+          title={`Tailoring ${title.toLowerCase()}...`}
+          description="You're on-device AI is tailoring this section"
+        />
       )}
       <article dangerouslySetInnerHTML={{ __html: content }} />
     </main>

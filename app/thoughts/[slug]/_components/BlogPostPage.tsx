@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import type { BlogPost } from "../../../_lib/blog.server";
-import { renderMarkdown } from "../../../_lib/markdown";
-import { MARKDOWN_SANITIZER, sanitizeHtml } from "../../../_lib/html-sanitizer";
+import type { BlogPost } from "@/app/_lib/blog.server";
+import { renderMarkdown } from "@/app/_lib/markdown";
+import { MARKDOWN_SANITIZER, sanitizeHtml } from "@/app/_lib/html-sanitizer";
+import GenerationNotice from "@/app/_components/GenerationNotice";
 
 type BlogPostPageProps = {
   post: BlogPost;
@@ -70,13 +71,10 @@ function BlogPostPage({ post, draft, initialArticleHtml }: BlogPostPageProps) {
     <main className="blog-article-page">
       <Link className="all-posts-link" href="/thoughts/">← All posts</Link>
       {isExpanding ? (
-        <div className="blog-generation-status" role="status" aria-live="polite">
-          <span className="blog-generation-status__dot" aria-hidden="true" />
-          <div>
-            <strong>Developing the draft locally…</strong>
-            <p>You may skim the original draft while the full article takes shape.</p>
-          </div>
-        </div>
+        <GenerationNotice
+          title={`Expanding draft...`}
+          description="You're on-device AI is tailoring this section"
+        />
       ) : (
         <p className="eyebrow">{isExpanded ? "Article" : "Draft"}</p>
       )}

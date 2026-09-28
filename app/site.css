@@ -492,11 +492,6 @@ button:focus-visible {
 .profile-content article {
   max-width: 850px;
 }
-.profile-ai-note {
-  margin: -32px 0 32px;
-  color: var(--muted);
-  font: 11px/1.5 var(--mono);
-}
 .profile-content article h2 {
   margin: 46px 0 24px;
   padding-top: 16px;
@@ -564,7 +559,7 @@ button:focus-visible {
   margin: auto;
   padding: 64px 0 90px;
 }
-.blog-generation-status {
+.generation-notice {
   display: flex;
   align-items: flex-start;
   gap: 13px;
@@ -575,7 +570,7 @@ button:focus-visible {
   background: color-mix(in srgb, var(--coral) 7%, var(--paper));
   color: var(--ink);
 }
-.blog-generation-status__dot {
+.generation-notice__dot {
   flex: 0 0 11px;
   width: 11px;
   height: 11px;
@@ -584,15 +579,19 @@ button:focus-visible {
   background: var(--coral);
   animation: pulse 1.2s ease-in-out infinite;
 }
-.blog-generation-status strong {
+.generation-notice strong {
   display: block;
   font-size: 15px;
   line-height: 1.4;
 }
-.blog-generation-status p {
+.generation-notice p {
   margin: 3px 0 0;
   font-size: 12px;
   line-height: 1.5;
+}
+.profile-content .generation-notice {
+  margin-top: -32px;
+  margin-bottom: 32px;
 }
 .blog-article-page article {
   max-width: 760px;
@@ -636,7 +635,7 @@ button:focus-visible {
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .blog-generation-status__dot {
+  .generation-notice__dot {
     animation: none;
   }
 }
