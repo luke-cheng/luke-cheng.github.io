@@ -9,27 +9,6 @@ const MODEL_OPTIONS: LanguageModelCreateCoreOptions = {
   expectedOutputs: [{ type: "text", languages: ["en"] }],
 };
 
-const TAB_SCHEMA = {
-  type: "object",
-  properties: {
-    tabs: {
-      type: "array",
-      minItems: 3,
-      maxItems: 5,
-      items: {
-        type: "object",
-        properties: {
-          id: { type: "string" },
-          label: { type: "string" },
-          prompt: { type: "string" },
-        },
-        required: ["id", "label", "prompt"],
-      },
-    },
-  },
-  required: ["tabs"],
-};
-
 const SUGGESTIONS_SCHEMA = {
   type: "object",
   properties: {
@@ -43,21 +22,21 @@ const SUGGESTIONS_SCHEMA = {
   required: ["questions"],
 };
 
-const FALLBACK_TABS: PortfolioTab[] = [
+const PORTFOLIO_TABS: PortfolioTab[] = [
   {
-    id: "systems",
-    label: "Systems at scale",
-    prompt: "Focus on professional engineering experience and impact.",
+    id: "professional-work",
+    label: "Professional work",
+    prompt: "Focus on professional engineering work, collaboration, and the systems shaped by that work.",
   },
   {
     id: "experiments",
-    label: "Side experiments",
-    prompt: "Focus on personal projects, product work, and technical curiosity.",
+    label: "Experiments",
+    prompt: "Focus on personal projects, product exploration, and technical curiosity.",
   },
   {
-    id: "outside",
-    label: "Outside the stack",
-    prompt: "Focus on leadership, interests, and the ideas behind the work.",
+    id: "personal-approach",
+    label: "Personal approach",
+    prompt: "Focus on leadership, interests, values, and the ideas behind the work.",
   },
 ];
 
@@ -116,8 +95,7 @@ function sanitizeCanvas(html: string): string {
 
 export function usePortfolioAi() {
   const [phase, setPhase] = useState<AiPhase>({ status: "checking" });
-  const [tabs, setTabs] = useState(FALLBACK_TABS);
-  const [activeTab, setActiveTab] = useState(FALLBACK_TABS[0].id);
+  const [activeTab, setActiveTab] = useState(PORTFOLIO_TABS[0].id);
   const [canvas, setCanvas] = useState(FALLBACK_CANVAS);
   const [question, setQuestion] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -166,21 +144,6 @@ export function usePortfolioAi() {
       if (refreshWhenReady) {
         window.location.reload();
         return;
-      }
-
-      // Generate tabs
-      const tabSession = await session.clone();
-      try {
-        const result = await tabSession.prompt(
-          "Create exactly three concise navigation tabs for this portfolio. Return JSON matching the requested schema.",
-          { responseConstraint: TAB_SCHEMA },
-        );
-        const parsed = JSON.parse(result) as { tabs?: PortfolioTab[] };
-        if (!cancelled && parsed.tabs?.length === 3) setTabs(parsed.tabs);
-      } catch (err) {
-        console.error("Tab generation failed:", err);
-      } finally {
-        tabSession.destroy();
       }
 
       // Generate suggestions
@@ -331,20 +294,20 @@ export function usePortfolioAi() {
       return;
     }
     setQuestion("");
-    const tab = tabs.find((t) => t.id === activeTab) ?? tabs[0];
+    const tab = PORTFOLIO_TABS.find((t) => t.id === activeTab) ?? PORTFOLIO_TABS[0];
     void generateCanvas(tab, trimmed);
   };
 
   const handleSuggestionSelect = (selected: string) => {
     if (!isReady || isGenerating) return;
     setQuestion("");
-    const tab = tabs.find((t) => t.id === activeTab) ?? tabs[0];
+    const tab = PORTFOLIO_TABS.find((t) => t.id === activeTab) ?? PORTFOLIO_TABS[0];
     void generateCanvas(tab, selected);
   };
 
   return {
     phase,
-    tabs,
+    tabs: PORTFOLIO_TABS,
     activeTab,
     canvas,
     question,

@@ -29,6 +29,9 @@ function SiteHeader({
         >
           <strong>Luke Cheng</strong>
         </button>
+        <a className="blog-link" href="/?page=blog">
+          Blog ↗
+        </a>
         <nav className="tab-nav" aria-label="Portfolio views">
           {tabs.map((tab, index) => (
             <button

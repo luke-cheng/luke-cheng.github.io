@@ -3,11 +3,12 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
 import PortfolioPage from './PortfolioPage.tsx'
+import BlogPage from './BlogPage.tsx'
 
-const isPortfolioPage = new URLSearchParams(window.location.search).get("page") === "portfolio";
+const page = new URLSearchParams(window.location.search).get("page");
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {isPortfolioPage ? <PortfolioPage /> : <App />}
+    {page === "portfolio" ? <PortfolioPage /> : page === "blog" ? <BlogPage /> : <App />}
   </StrictMode>,
 )
