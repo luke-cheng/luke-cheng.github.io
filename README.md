@@ -1,8 +1,29 @@
 # Luke-Cheng.github.io
 
-An experimental personal website which generate the html page as user interact with Google Chrome's on-device AI, Gemini Nano banana.
+An experimental personal website with a portfolio canvas powered by Chrome's on-device AI.
 
-## Prompt
+## Current app
+
+This site uses Next.js App Router with static export. `npm run build` writes the deployable site to `out/`.
+Routes live in `app/`; shared UI, browser hooks, and build-time blog data are organized under `app/_components/`, `app/_hooks/`, and `app/_lib/`.
+
+- `/` — portfolio AI question box and generated canvas
+- `/work/` — work experience
+- `/interests/` — interests and activities
+- `/thoughts/` — blog index, newest first
+- `/thoughts/[slug]/` — an individual draft, expanded in the visitor's browser when Chrome's on-device AI is available
+
+Blog routes and their draft HTML are generated from `content/blogs/` at build time. The site can be hosted as static files; it does not require a running Next.js server. Browser AI can expand each draft in the visitor's browser.
+
+## Development
+
+```sh
+npm install
+npm run dev
+npm run build
+```
+
+## Original project prompt (archive)
 
 > code is cheap, show me the prompts
 
@@ -17,7 +38,7 @@ Help me build an experimental personal portfolio website powered by Chrome's bui
 
 ## Tech Stack & Architecture
 
-- **Build Tool:** Vite + Vanilla TypeScript.
+- **Original build tool:** Vite + React (the app has since moved to Next.js).
 - **AI Engine:** Chrome Built-in Prompt API (`languageModel`).
 - **HTML Sanitization:** `DOMPurify`.
 
@@ -32,8 +53,7 @@ Help me build an experimental personal portfolio website powered by Chrome's bui
 
 ### 2. Theme Engine
 
-- Prompt the on-device AI on page load to generate a JSON map of CSS variables (e.g., `--bg`, `--text`, `--accent`, `--layout-gap`) derived from `portfolio.md`.
-- Inject these CSS variables directly into `<style id="theme">` on `document.head`.
+- Prompt the on-device AI on page load to generate a JSON map of CSS variables
 
 ### 3. Header & Navigation
 

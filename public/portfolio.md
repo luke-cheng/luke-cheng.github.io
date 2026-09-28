@@ -6,10 +6,10 @@
 
 ### Software Engineer | JPMorgan Chase, New York, NY
 
-> Dec 2025 - Present
+> Dec 2025 – Present
 
-- Contributed to the query side of a CQRS-style centralized customer data platform, building the Customer Summary Utility to consolidate customer information from multiple internal systems and serve 10M+ daily requests (~10K TPS) with p99 latency below 200 ms using Java, Spring Boot, Kafka, Cassandra, and CockroachDB.
-- Implemented Change Data Capture design pattern to propagate database changes through lightweight Kafka events rather than transmitting full customer payloads, reducing messaging overhead and enabling lower-latency updates to the customer read model.
+- Contributed to the query side of a CQRS-style centralized customer data platform, building the Customer Summary Utility to consolidate customer information from multiple internal systems and serve 10M+ daily requests (~10K TPS) with p99 latency below 200 ms using Spring Boot, Kafka, Cassandra, and CockroachDB.
+- Implemented a Change Data Capture design pattern to propagate database changes through lightweight Kafka events rather than transmitting full customer payloads, reducing messaging overhead and enabling lower-latency updates to the customer-read model.
 - Implemented reactive Kafka consumers with batch processing to asynchronously process customer-data changes at high throughput, keeping the query-side data model synchronized while reducing coupling between upstream systems and the customer-facing API.
 - Supported the platform's transition to Kubernetes-based infrastructure as traffic increased, improving horizontal scalability, deployment consistency, and operational reliability for high-throughput services.
 - Expanded automated testing across diverse customer datasets—including addresses, phone numbers, account-to-customer relationships, account identifiers, and card data—using JUnit and Cucumber, providing regression coverage for data-processing paths that could not be reliably exercised through UAT alone.
@@ -21,7 +21,7 @@
 
 ### Co-Founder | MOYU LLC, Pittsburgh, PA
 
-> Feb 2023 - Jan 2024
+> Feb 2023–Jan 2024
 
 - Founded an early-stage startup exploring semantic version control for CAD/BIM assets, addressing workflow limitations for complex engineering design files.
 - Developed cross-platform visualization and revision-diff tooling using Next.js, Electron, and Three.js for large-scale 2D and 3D architectural models.
@@ -29,7 +29,7 @@
 
 ### Graduate Software Developer | University of Pittsburgh Medical Center, Pittsburgh, PA
 
-> Feb 2023 - Jan 2024
+> Feb 2023–Jan 2024
 
 - Built a HIPAA-compliant clinical analytics platform by translating requirements from 50+ clinicians into scalable healthcare software using Java, Spring Boot, MySQL, FHIR APIs, and AWS.
 - Developed Python NLP pipelines using spaCy, NLTK, and custom information extraction techniques to convert unstructured clinical notes into structured medical knowledge.
@@ -38,7 +38,7 @@
 
 ### Research Scientist | ChemPacific Corp, Baltimore, MD
 
-> May 2021 - May 2022
+> May 2021–May 2022
 
 - Applied data science techniques to laboratory manufacturing datasets, building Python workflows that improved process visibility and operational decision-making.
 - Designed automated laboratory data pipelines integrating Agilent analytical instrumentation with enterprise systems, improving traceability and reducing manual processing.
@@ -49,11 +49,11 @@
 
 ### Master of Science in Computer & Information Science | University of Pittsburgh
 
-> Aug 2022 - May 2024
+> Aug 2022–May 2024
 
 ### Bachelor of Science in Chemistry and Philosophy | Virginia Tech
 
-> Aug 2016 - Dec 2020
+> Aug 2016–Dec 2020
 
 ## Personal Projects
 
@@ -89,7 +89,7 @@
 - **Skiing**: Active meditation and outdoor focus.
 - **Philosophy**: Critical thinking, ethics, and epistemology.
 - **Gaming & Simulation**:
-  - Automation & Systems: Screeps, Factorio (modular design, programmatic problem-solving).
-  - Resource Management: Oxygen Not Included (prioritization and system balance under constraints).
-  - Narrative & Ethics: This War of Mine, Papers, Please (high-stakes decision-making and ethical dilemmas).
-  - Visual & Interactive Design: Return of the Obra Dinn, What Remains of Edith Finch (deduction, atmosphere, and visual storytelling).
+    - Automation & Systems: Screeps, Factorio (modular design, programmatic problem-solving).
+    - Resource Management: Oxygen Not Included (prioritization and system balance under constraints).
+    - Narrative & Ethics: This War of Mine, Papers, Please (high-stakes decision-making and ethical dilemmas).
+    - Visual & Interactive Design: Return of the Obra Dinn, What Remains of Edith Finch (deduction, atmosphere, and visual storytelling).

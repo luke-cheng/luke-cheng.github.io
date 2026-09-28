@@ -1,0 +1,36 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import BlogPostPage from "../../_components/BlogPostPage";
+import { getBlogPost, getBlogPosts } from "../../_lib/blog.server";
+import { renderMarkdown, stripFrontMatter } from "../../_lib/markdown";
+
+type BlogPostRouteProps = {
+  params: Promise<{ slug: string }>;
+};
+
+export const dynamicParams = false;
+
+export async function generateStaticParams() {
+  const posts = await getBlogPosts();
+  return posts.map((post) => ({ slug: post.slug }));
+}
+
+export async function generateMetadata({ params }: BlogPostRouteProps): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await getBlogPost(slug);
+  if (!post) return {};
+
+  return {
+    title: `${post.title} | Luke Cheng`,
+    description: post.description,
+  };
+}
+
+export default async function ThoughtsPostRoute({ params }: BlogPostRouteProps) {
+  const { slug } = await params;
+  const post = await getBlogPost(slug);
+  if (!post) notFound();
+
+  const initialArticleHtml = renderMarkdown(stripFrontMatter(post.draft));
+  return <BlogPostPage post={post} draft={post.draft} initialArticleHtml={initialArticleHtml} />;
+}
