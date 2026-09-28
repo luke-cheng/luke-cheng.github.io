@@ -1,63 +1,71 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { marked } from "marked";
-import type { SitePage } from "../_lib/types";
+import type { ProfilePage } from "../_lib/profile.server";
+import { renderMarkdown } from "../_lib/markdown";
 import { MARKDOWN_SANITIZER, sanitizeHtml } from "../_lib/html-sanitizer";
 
 type ProfileSectionPageProps = {
-  page: Exclude<SitePage, "home" | "thoughts">;
+  page: ProfilePage;
+  source: string;
+  staticHtml: string;
 };
 
-const SECTION_TITLES: Record<ProfileSectionPageProps["page"], string[]> = {
-  work: ["Experience"],
-  interests: ["Leadership & Activities", "Interests & Hobbies"],
+const MODEL_OPTIONS: LanguageModelCreateCoreOptions = {
+  expectedInputs: [{ type: "text", languages: ["en"] }],
+  expectedOutputs: [{ type: "text", languages: ["en"] }],
 };
 
-function pickSections(markdown: string, titles: string[]) {
-  const selectedTitles = new Set(titles);
-  let includeSection = false;
-
-  return markdown
-    .split(/\r?\n/)
-    .filter((line) => {
-      const heading = line.match(/^##\s+(.+)$/);
-      if (heading) includeSection = selectedTitles.has(heading[1].trim());
-      return includeSection;
-    })
-    .join("\n");
-}
-
-function ProfileSectionPage({ page }: ProfileSectionPageProps) {
-  const [content, setContent] = useState("");
-  const [error, setError] = useState("");
+function ProfileSectionPage({ page, source, staticHtml }: ProfileSectionPageProps) {
   const title = page === "work" ? "Work" : "Interests";
   const intro = page === "work"
     ? "Work experience"
     : "Interests, activities, and things I think about.";
+  const [content, setContent] = useState(staticHtml);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
-    fetch("/portfolio.md")
-      .then((response) => {
-        if (!response.ok) throw new Error("The portfolio content could not be loaded.");
-        return response.text();
-      })
-      .then((markdown) => {
-        const sections = pickSections(markdown, SECTION_TITLES[page]);
-        setContent(sanitizeHtml(marked.parse(sections) as string, MARKDOWN_SANITIZER));
-      })
-      .catch((loadError: Error) => setError(loadError.message));
-  }, [page]);
+    let active = true;
+    let session: LanguageModel | null = null;
+    setContent(staticHtml);
+
+    const generateProfile = async () => {
+      if (typeof LanguageModel === "undefined") return;
+
+      setIsGenerating(true);
+      try {
+        session = await LanguageModel.create(MODEL_OPTIONS);
+        const generated = await session.prompt(
+          `Turn this portfolio section into a concise, thoughtful ${title.toLowerCase()} page. Preserve every factual claim and do not invent details, dates, metrics, or responsibilities. Improve the hierarchy and readability, but keep all useful information. Return Markdown only.\n\nPortfolio section:\n${source}`,
+        );
+        if (active) {
+          setContent(sanitizeHtml(renderMarkdown(generated), MARKDOWN_SANITIZER));
+        }
+      } catch {
+        // The static HTML is intentionally retained when on-device AI is unavailable or fails.
+      } finally {
+        session?.destroy();
+        if (active) setIsGenerating(false);
+      }
+    };
+
+    void generateProfile();
+    return () => {
+      active = false;
+      session?.destroy();
+    };
+  }, [source, staticHtml, title]);
 
   return (
     <main className="profile-content">
       <p className="eyebrow">{title}</p>
       <h1>{intro}</h1>
-      {error ? (
-        <p className="error-message">{error}</p>
-      ) : (
-        <article dangerouslySetInnerHTML={{ __html: content }} />
+      {isGenerating && (
+        <p className="profile-ai-note" role="status">
+          Tailoring this page locally while the static profile remains available.
+        </p>
       )}
+      <article dangerouslySetInnerHTML={{ __html: content }} />
     </main>
   );
 }

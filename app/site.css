@@ -492,6 +492,11 @@ button:focus-visible {
 .profile-content article {
   max-width: 850px;
 }
+.profile-ai-note {
+  margin: -32px 0 32px;
+  color: var(--muted);
+  font: 11px/1.5 var(--mono);
+}
 .profile-content article h2 {
   margin: 46px 0 24px;
   padding-top: 16px;

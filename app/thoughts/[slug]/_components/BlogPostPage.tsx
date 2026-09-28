@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import type { BlogPost } from "../_lib/blog.server";
-import { renderMarkdown } from "../_lib/markdown";
-import { MARKDOWN_SANITIZER, sanitizeHtml } from "../_lib/html-sanitizer";
+import type { BlogPost } from "../../../_lib/blog.server";
+import { renderMarkdown } from "../../../_lib/markdown";
+import { MARKDOWN_SANITIZER, sanitizeHtml } from "../../../_lib/html-sanitizer";
 
 type BlogPostPageProps = {
   post: BlogPost;
