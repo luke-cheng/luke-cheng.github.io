@@ -1,0 +1,9 @@
+[
+  {
+    "slug": "building-for-change",
+    "file": "blog/building-for-change.md",
+    "title": "Building for change, not just scale",
+    "date": "2026-09-20",
+    "description": "A draft about the small engineering decisions that keep systems understandable as they grow."
+  }
+]
