@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import BlogPostPage from "./_components/BlogPostPage";
+import BlogPostPage from "../../_components/BlogPostPage";
 import { getBlogPost, getBlogPosts } from "../../_lib/blog.server";
 import { renderMarkdown, stripFrontMatter } from "../../_lib/markdown";
 

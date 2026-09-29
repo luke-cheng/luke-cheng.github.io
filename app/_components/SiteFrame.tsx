@@ -3,9 +3,8 @@
 import type { ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { usePortfolioAi } from "../_hooks/usePortfolioAi";
-import type { SitePage } from "../_lib/types";
 import SiteFooter from "./SiteFooter";
-import SiteHeader from "./SiteHeader";
+import SiteHeader, { type SitePage } from "./SiteHeader";
 import { PortfolioAiContext } from "./PortfolioAiContext";
 
 function getCurrentPage(pathname: string): SitePage {

@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import type { SitePage } from "./types";
+import type { SitePage } from "../_components/SiteHeader";
 import { renderMarkdown } from "./markdown";
 
 export type ProfilePage = Exclude<SitePage, "home" | "thoughts">;

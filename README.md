@@ -13,7 +13,7 @@ Routes live in `app/`; shared UI, browser hooks, and build-time blog data are or
 - `/thoughts/` — blog index, newest first
 - `/thoughts/[slug]/` — an individual draft, expanded in the visitor's browser when Chrome's on-device AI is available
 
-Blog routes and their draft HTML are generated from `content/blogs/` at build time. The site can be hosted as static files; it does not require a running Next.js server. Browser AI can expand each draft in the visitor's browser.
+Blog routes and their draft HTML are generated from `public/blog` at build time. The site can be hosted as static files; it does not require a running Next.js server. Browser AI can expand each draft in the visitor's browser.
 
 ## Development
 
@@ -70,5 +70,5 @@ Help me build an experimental personal portfolio website powered by Chrome's bui
 
 ### 5. Static Footer
 
-- Fixed footer displaying something alone: _"Content and layout dynamically generated via Your Browser's on-device AI. So be careful with navigating as it'll trigger a regenerate."_ With icons to github, to linkedin, and to `/public/portfolio.md` for users to view the raw content.
+- Fixed footer displaying something alone: _"Content and layout dynamically generated via Your Browser's on-device AI. So be careful with navigating as it'll trigger a regenerating."_ With icons to github, to linkedin, and to `/public/portfolio.md` for users to view the raw content.
 ````

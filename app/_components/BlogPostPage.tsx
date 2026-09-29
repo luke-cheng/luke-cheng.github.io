@@ -27,11 +27,24 @@ function BlogPostPage({ post, draft, initialArticleHtml }: BlogPostPageProps) {
   useEffect(() => {
     let active = true;
     let session: LanguageModel | null = null;
-    setArticle(initialArticleHtml);
+    const storageKey = `blog_post_expanded_${post.slug}`;
 
     const expandDraft = async () => {
+      try {
+        const cached = sessionStorage.getItem(storageKey);
+        if (cached) {
+          if (active) {
+            setArticle(cached);
+            setIsExpanded(true);
+          }
+          return;
+        }
+      } catch {
+        // sessionStorage might be restricted or unavailable
+      }
+
       if (typeof LanguageModel === "undefined") {
-        setExpansionError("On-device AI is unavailable in this browser.");
+        if (active) setExpansionError("On-device AI is unavailable in this browser.");
         return;
       }
 
@@ -47,8 +60,14 @@ function BlogPostPage({ post, draft, initialArticleHtml }: BlogPostPageProps) {
           `Turn this blog draft into a complete article. Treat the draft as the wireframe: keep its central idea and point order, use clear section headings to develop the ideas, open with a concise framing paragraph, and end with a short synthesis. Preserve the author's direct, reflective voice. Keep every factual claim grounded in the draft. Do not invent events, examples, research, results, or personal details. Return Markdown only, with the supplied title as the H1.\n\nTitle: ${post.title}\nDescription: ${post.description}\n\nDraft wireframe:\n${draft}`,
         );
         if (active) {
-          setArticle(sanitizeHtml(renderMarkdown(expanded), MARKDOWN_SANITIZER));
+          const sanitized = sanitizeHtml(renderMarkdown(expanded), MARKDOWN_SANITIZER);
+          setArticle(sanitized);
           setIsExpanded(true);
+          try {
+            sessionStorage.setItem(storageKey, sanitized);
+          } catch {
+            // Ignore sessionStorage quota or access errors
+          }
         }
       } catch (error) {
         if (active) {
@@ -65,15 +84,15 @@ function BlogPostPage({ post, draft, initialArticleHtml }: BlogPostPageProps) {
       active = false;
       session?.destroy();
     };
-  }, [draft, initialArticleHtml, post.description, post.title]);
+  }, [draft, post.description, post.slug, post.title]);
 
   return (
     <main className="blog-article-page">
       <Link className="all-posts-link" href="/thoughts/">← All posts</Link>
       {isExpanding ? (
         <GenerationNotice
-          title={`Expanding draft...`}
-          description="You're on-device AI is tailoring this section"
+          title={`Writing...`}
+          description="On-device AI is expanidng this draft into a full article"
         />
       ) : (
         <p className="eyebrow">{isExpanded ? "Article" : "Draft"}</p>

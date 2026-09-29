@@ -1,9 +1,24 @@
-import type { PortfolioAssistantProps, SiteHeaderProps } from "../_lib/types";
 import Link from "next/link";
+import { PaperPlaneTiltIcon, StopIcon, SparkleIcon } from "@phosphor-icons/react";
 
-import AutoAwesomeOutlinedIcon from "@mui/icons-material/AutoAwesomeOutlined";
-import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
-import StopCircleOutlinedIcon from "@mui/icons-material/StopCircleOutlined";
+export type SitePage = "home" | "work" | "interests" | "thoughts";
+
+export type PortfolioAssistantProps = {
+  question: string;
+  suggestions: string[];
+  statusLabel: string;
+  isReady: boolean;
+  isGenerating: boolean;
+  onQuestionChange: (question: string) => void;
+  onQuestion: (event: React.SyntheticEvent<HTMLFormElement>) => void;
+  onSuggestionSelect: (question: string) => void;
+  onStop: () => void;
+};
+
+export type SiteHeaderProps = {
+  page: SitePage;
+  assistant: PortfolioAssistantProps;
+};
 
 function PortfolioControls(props: PortfolioAssistantProps) {
   const {
@@ -22,7 +37,7 @@ function PortfolioControls(props: PortfolioAssistantProps) {
     <div className="header-bottom">
       <form className="question-bar" onSubmit={onQuestion}>
         <span className="prompt-symbol" aria-hidden="true">
-          <AutoAwesomeOutlinedIcon fontSize="inherit" />
+          <SparkleIcon fontSize="inherit" />
         </span>
         <input
           value={question}
@@ -47,7 +62,7 @@ function PortfolioControls(props: PortfolioAssistantProps) {
             title="Stop generating"
             onClick={onStop}
           >
-            <StopCircleOutlinedIcon fontSize="inherit" aria-hidden="true" />
+            <StopIcon fontSize="inherit" aria-hidden="true" />
           </button>
         ) : (
           <button
@@ -56,7 +71,7 @@ function PortfolioControls(props: PortfolioAssistantProps) {
             aria-label="Ask question"
             disabled={!isReady || !question.trim()}
           >
-            <SendOutlinedIcon fontSize="inherit" aria-hidden="true" />
+            <PaperPlaneTiltIcon fontSize="inherit" aria-hidden="true" />
           </button>
         )}
       </form>

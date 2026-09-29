@@ -1,13 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import type { AiError, AiPhase } from "../_lib/types";
+import { useCallback, useEffect, useState } from "react";
 import { PORTFOLIO_SANITIZER, sanitizeHtml } from "../_lib/html-sanitizer";
+import { DEFAULT_MODEL_OPTIONS, usePromptAPI } from "./usePromptAPI";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
-
-const MODEL_OPTIONS: LanguageModelCreateCoreOptions = {
-  expectedInputs: [{ type: "text", languages: ["en"] }],
-  expectedOutputs: [{ type: "text", languages: ["en"] }],
-};
 
 const SUGGESTIONS_SCHEMA = {
   type: "object",
@@ -38,24 +33,6 @@ Portfolio source:
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function toAiError(error: unknown): AiError {
-  if (error instanceof Error) {
-    return { name: error.name, message: error.message };
-  }
-  return { name: "Error", message: String(error) };
-}
-
-function getStatusLabel(phase: AiPhase, isGenerating: boolean): string {
-  switch (phase.status) {
-    case "checking":      return "Checking local model";
-    case "downloadable":  return "Preparing local model download";
-    case "downloading":   return "Downloading local model";
-    case "unavailable":   return "Chrome AI unavailable";
-    case "error":         return "Chrome AI setup failed";
-    case "ready":         return isGenerating ? "Generating…" : "Chrome on-device AI ready";
-  }
-}
-
 function sanitizeCanvas(html: string): string {
   const withoutFences = html
     .replace(/^\s*```(?:html)?\s*/i, "")
@@ -66,82 +43,37 @@ function sanitizeCanvas(html: string): string {
 // ─── Hook ────────────────────────────────────────────────────────────────────
 
 export function usePortfolioAi() {
-  const [phase, setPhase] = useState<AiPhase>({ status: "checking" });
   const [canvas, setCanvas] = useState(INIT_CANVAS);
   const [question, setQuestion] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generationError, setGenerationError] = useState<AiError | null>(null);
 
-  const sessionRef = useRef<LanguageModel | null>(null);
-  const generationSessionRef = useRef<LanguageModel | null>(null);
-  const abortRef = useRef<AbortController | null>(null);
-  const generationIdRef = useRef(0);
+  const promptApi = usePromptAPI({
+    autoInitialize: false,
+    autoReloadOnDownload: true,
+  });
 
-  const isReady = phase.status === "ready";
+  const {
+    phase,
+    isReady,
+    isGenerating,
+    error: generationError,
+    contextUsage,
+    contextWindow,
+    contextPercent,
+    statusLabel,
+    createSession,
+    promptStreaming,
+    stop,
+    reset,
+    clearError,
+  } = promptApi;
 
   useEffect(() => {
     let cancelled = false;
 
-    const createSession = async (source: string, refreshWhenReady = false) => {
-      if (typeof LanguageModel === "undefined") return;
-
-      let session: LanguageModel;
-      try {
-        session = await LanguageModel.create({
-          ...MODEL_OPTIONS,
-          initialPrompts: [
-            { role: "system", content: `${SYSTEM_PROMPT}\n${source}` },
-          ],
-          monitor: (monitor) =>
-            monitor.addEventListener("downloadprogress", (e) =>
-              setPhase({ status: "downloading", progress: e.loaded }),
-            ),
-        });
-      } catch (err) {
-        console.error(err);
-        setPhase({ status: "error", error: toAiError(err) });
-        return;
-      }
-
-      if (cancelled) {
-        session.destroy();
-        return;
-      }
-
-      sessionRef.current = session;
-      setPhase({ status: "ready" });
-
-      if (refreshWhenReady) {
-        window.location.reload();
-        return;
-      }
-
-      // Generate suggestions
-      const suggestionSession = await session.clone();
-      try {
-        const result = await suggestionSession.prompt(
-          "Create 2 to 5 concise generic one sentence questions a visitor might ask about this portfolio. Return JSON matching the requested schema.",
-          { responseConstraint: SUGGESTIONS_SCHEMA },
-        );
-        const parsed = JSON.parse(result) as { questions?: unknown[] };
-        const generated = parsed.questions
-          ?.filter((item): item is string => typeof item === "string")
-          .map((item) => item.trim())
-          .filter(Boolean)
-          .slice(0, 4);
-        if (!cancelled && generated?.length) setSuggestions(generated);
-      } catch (err) {
-        console.error("Suggestion generation failed:", err);
-      } finally {
-        suggestionSession.destroy();
-      }
-    };
-
     const boot = async () => {
-      // If the API doesn't exist at all, show "browser not supported" immediately.
       if (typeof LanguageModel === "undefined") {
-        setPhase({ status: "unavailable" });
+        await createSession();
         return;
       }
 
@@ -151,34 +83,39 @@ export function usePortfolioAi() {
             if (!r.ok) throw new Error("The portfolio could not be loaded.");
             return r.text();
           }),
-          LanguageModel.availability(MODEL_OPTIONS),
+          LanguageModel.availability(DEFAULT_MODEL_OPTIONS),
         ]);
 
         if (cancelled) return;
 
-        switch (status) {
-          case "available":
-            setPhase({ status: "checking" });
-            await createSession(source);
-            break;
-          case "downloadable":
-            setPhase({ status: "downloadable", progress: 0 });
-            await createSession(source, true);
-            break;
-          case "downloading":
-            setPhase({ status: "downloading", progress: 0 });
-            await createSession(source, true);
-            break;
-          case "unavailable":
-            // API exists but availability() says the device can't run it.
-            // Attempt create() anyway so Chrome throws the real error with
-            // the actual reason (disk space, VRAM, etc.) rather than us guessing.
-            await createSession(source);
-            break;
+        const session = await createSession(
+          [{ role: "system", content: `${SYSTEM_PROMPT}\n${source}` }],
+          status === "downloadable" || status === "downloading",
+        );
+
+        if (!session || cancelled) return;
+
+        // Generate suggestions using cloned session so main session context remains clean
+        const suggestionSession = await session.clone();
+        try {
+          const result = await suggestionSession.prompt(
+            "Create 2 to 5 concise generic one sentence questions a visitor might ask about this portfolio. Return JSON matching the requested schema.",
+            { responseConstraint: SUGGESTIONS_SCHEMA },
+          );
+          const parsed = JSON.parse(result) as { questions?: unknown[] };
+          const generated = parsed.questions
+            ?.filter((item): item is string => typeof item === "string")
+            .map((item) => item.trim())
+            .filter(Boolean)
+            .slice(0, 4);
+          if (!cancelled && generated?.length) setSuggestions(generated);
+        } catch (err) {
+          console.error("Suggestion generation failed:", err);
+        } finally {
+          suggestionSession.destroy();
         }
       } catch (err) {
         console.error(err);
-        setPhase({ status: "error", error: toAiError(err) });
       }
     };
 
@@ -186,86 +123,46 @@ export function usePortfolioAi() {
 
     return () => {
       cancelled = true;
-      generationIdRef.current += 1;
-      abortRef.current?.abort();
-      generationSessionRef.current?.destroy();
-      sessionRef.current?.destroy();
     };
-  }, []);
+  }, [createSession]);
 
-  const generateAnswer = async (requestedQuestion: string) => {
-    const mainSession = sessionRef.current;
-    if (!mainSession) return;
-
-    const generationId = ++generationIdRef.current;
-    abortRef.current?.abort();
-    generationSessionRef.current?.destroy();
-
-    const controller = new AbortController();
-    abortRef.current = controller;
-
-    setIsGenerating(true);
-    setGenerationError(null);
-
-    let session: LanguageModel | null = null;
-    let output = "";
-
-    try {
-      session = await mainSession.clone();
-
-      if (generationId !== generationIdRef.current) {
-        session.destroy();
-        return;
-      }
-
-      generationSessionRef.current = session;
-
+  const generateAnswer = useCallback(
+    async (requestedQuestion: string) => {
       const request = `Answer the visitor's question directly: "${requestedQuestion}" Use the portfolio source as your only evidence. Explain the relevant connections, reasoning, or tradeoffs when the source supports them. Do not merely list experience. Present the answer as a thoughtful, focused portfolio canvas in semantic HTML. Return semantic HTML only.`;
 
-      const stream = session.promptStreaming(request, { signal: controller.signal });
-      const reader = stream.getReader();
       try {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          if (generationId !== generationIdRef.current) return;
-          output += value;
-          setCanvas(sanitizeCanvas(output));
-        }
-      } finally {
-        reader.releaseLock();
+        await promptStreaming(request, {
+          onChunk: (_chunk, cumulative) => {
+            setCanvas(sanitizeCanvas(cumulative));
+          },
+        });
+      } catch {
+        // error state is managed by usePromptAPI
       }
-    } catch (err) {
-      if (generationId === generationIdRef.current && (err as Error).name !== "AbortError") {
-        console.error(err);
-        setGenerationError(toAiError(err));
-      }
-    } finally {
-      session?.destroy();
-      if (generationId === generationIdRef.current && generationSessionRef.current === session) {
-        generationSessionRef.current = null;
-        setIsGenerating(false);
-      }
-    }
-  };
+    },
+    [promptStreaming],
+  );
 
-  const handleQuestion = (event: React.SyntheticEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const trimmed = question.trim();
-    if (!trimmed) return;
-    if (!isReady) {
-      setGenerationError({ name: "Error", message: "On-device AI is not ready yet. Try again once Chrome AI becomes available." });
-      return;
-    }
-    setQuestion("");
-    void generateAnswer(trimmed);
-  };
+  const handleQuestion = useCallback(
+    (event: React.SyntheticEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      const trimmed = question.trim();
+      if (!trimmed) return;
+      if (!isReady) return;
+      setQuestion("");
+      void generateAnswer(trimmed);
+    },
+    [generateAnswer, isReady, question],
+  );
 
-  const handleSuggestionSelect = (selected: string) => {
-    if (!isReady || isGenerating) return;
-    setQuestion("");
-    void generateAnswer(selected);
-  };
+  const handleSuggestionSelect = useCallback(
+    (selected: string) => {
+      if (!isReady || isGenerating) return;
+      setQuestion("");
+      void generateAnswer(selected);
+    },
+    [generateAnswer, isGenerating, isReady],
+  );
 
   return {
     phase,
@@ -275,12 +172,17 @@ export function usePortfolioAi() {
     isReady,
     isGenerating,
     generationError,
-    statusLabel: getStatusLabel(phase, isGenerating),
+    contextUsage,
+    contextWindow,
+    contextPercent,
+    statusLabel,
     onQuestionChange: setQuestion,
     onQuestion: handleQuestion,
     onSuggestionSelect: handleSuggestionSelect,
-    onStop: () => abortRef.current?.abort(),
-    onReset: () => window.location.reload(),
-    onDismissError: () => setGenerationError(null),
+    onStop: stop,
+    onReset: reset,
+    onDismissError: clearError,
   };
 }
+
+export default usePortfolioAi;

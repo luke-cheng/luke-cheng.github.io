@@ -28,7 +28,6 @@ function ProfileSectionPage({ page, source, staticHtml }: ProfileSectionPageProp
   useEffect(() => {
     let active = true;
     let session: LanguageModel | null = null;
-    setContent(staticHtml);
 
     const generateProfile = async () => {
       if (typeof LanguageModel === "undefined") return;
@@ -64,7 +63,7 @@ function ProfileSectionPage({ page, source, staticHtml }: ProfileSectionPageProp
       {isGenerating && (
         <GenerationNotice
           title={`Tailoring ${title.toLowerCase()}...`}
-          description="You're on-device AI is tailoring this section"
+          description="On-device AI is working on this section"
         />
       )}
       <article dangerouslySetInnerHTML={{ __html: content }} />

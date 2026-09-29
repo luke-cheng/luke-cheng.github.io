@@ -9,7 +9,7 @@ export type BlogPost = {
   filename: string;
 };
 
-const blogDirectory = path.join(process.cwd(), "content", "blogs");
+const blogDirectory = path.join(process.cwd(), "public", "blog");
 
 function readFrontMatter(markdown: string) {
   const match = markdown.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);

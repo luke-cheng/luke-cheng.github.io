@@ -1,6 +1,4 @@
-import GitHubIcon from "@mui/icons-material/GitHub";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import {GithubLogoIcon, LinkedinLogoIcon , ReadCvLogoIcon} from "@phosphor-icons/react";
 
 function SiteFooter() {
   return (
@@ -16,7 +14,7 @@ function SiteFooter() {
           aria-label="GitHub"
           title="GitHub/Luke-Cheng"
         >
-          <GitHubIcon fontSize="inherit" aria-hidden="true" />
+          <GithubLogoIcon fontSize="inherit" aria-hidden="true" />
         </a>
         <a
           href="https://www.linkedin.com/in/luke-cheng/"
@@ -25,14 +23,14 @@ function SiteFooter() {
           aria-label="LinkedIn"
           title="In/Luke-Cheng"
         >
-          <LinkedInIcon fontSize="inherit" aria-hidden="true" />
+          <LinkedinLogoIcon fontSize="inherit" aria-hidden="true" />
         </a>
         <a
           href="/portfolio.md"
           aria-label="Resume"
           title="Luke-Cheng-Resume.md"
         >
-          <DescriptionOutlinedIcon fontSize="inherit" aria-hidden="true" />
+          <ReadCvLogoIcon fontSize="inherit" aria-hidden="true" />
         </a>
       </div>
     </footer>
