@@ -23,10 +23,7 @@ export const DEFAULT_MODEL_OPTIONS: LanguageModelCreateCoreOptions = {
 };
 
 export type PromptApiOptions = {
-  systemPrompt?: string;
-  initialPrompts?: NonNullable<LanguageModelCreateOptions["initialPrompts"]>;
   modelOptions?: LanguageModelCreateCoreOptions;
-  autoInitialize?: boolean;
   autoReloadOnDownload?: boolean;
   onContextOverflow?: () => void;
 };
@@ -80,10 +77,7 @@ export function getPromptApiStatusLabel(
 
 export function usePromptAPI(options: PromptApiOptions = {}) {
   const {
-    systemPrompt,
-    initialPrompts,
     modelOptions = DEFAULT_MODEL_OPTIONS,
-    autoInitialize = true,
     autoReloadOnDownload = false,
     onContextOverflow,
   } = options;
@@ -121,7 +115,7 @@ export function usePromptAPI(options: PromptApiOptions = {}) {
 
   const createSession = useCallback(
     async (
-      overridePrompts?: NonNullable<LanguageModelCreateOptions["initialPrompts"]>,
+      initialPrompts?: NonNullable<LanguageModelCreateOptions["initialPrompts"]>,
       triggerReloadOnDownload = false,
     ): Promise<LanguageModel | null> => {
       if (typeof LanguageModel === "undefined") {
@@ -133,17 +127,10 @@ export function usePromptAPI(options: PromptApiOptions = {}) {
       sessionRef.current?.destroy();
       sessionRef.current = null;
 
-      const promptsToUse: NonNullable<LanguageModelCreateOptions["initialPrompts"]> | undefined =
-        overridePrompts ??
-        initialPrompts ??
-        (systemPrompt
-          ? [{ role: "system" as const, content: systemPrompt }]
-          : undefined);
-
       try {
         const session = await LanguageModel.create({
           ...modelOptions,
-          ...(promptsToUse && promptsToUse.length > 0 ? { initialPrompts: promptsToUse } : {}),
+          ...(initialPrompts?.length ? { initialPrompts } : {}),
           monitor: (monitor) =>
             monitor.addEventListener("downloadprogress", (e) =>
               setPhase({ status: "downloading", progress: e.loaded }),
@@ -175,94 +162,55 @@ export function usePromptAPI(options: PromptApiOptions = {}) {
     },
     [
       autoReloadOnDownload,
-      initialPrompts,
       modelOptions,
       onContextOverflow,
       syncContextStats,
-      systemPrompt,
     ],
   );
 
-  const init = useCallback(async () => {
-    if (typeof LanguageModel === "undefined") {
-      setPhase({ status: "unavailable" });
-      return;
-    }
-
-    try {
-      const status = await LanguageModel.availability(modelOptions);
-
-      switch (status) {
-        case "available":
-          setPhase({ status: "checking" });
-          await createSession();
-          break;
-        case "downloadable":
-        case "downloading":
-          setPhase({ status: "downloading", progress: 0 });
-          await createSession(undefined, true);
-          break;
-        case "unavailable":
-          // Attempt create() so Chrome surfaces the precise hardware/storage reason if any
-          await createSession();
-          break;
+  const initialize = useCallback(
+    async (
+      initialPrompts?: NonNullable<LanguageModelCreateOptions["initialPrompts"]>,
+    ): Promise<LanguageModel | null> => {
+      if (typeof LanguageModel === "undefined") {
+        setPhase({ status: "unavailable" });
+        return null;
       }
-    } catch (err) {
-      console.error(err);
-      const aiErr = toAiError(err);
-      setPhase({ status: "error", error: aiErr });
-      setError(aiErr);
-    }
-  }, [createSession, modelOptions]);
+
+      try {
+        const status = await LanguageModel.availability(modelOptions);
+
+        switch (status) {
+          case "available":
+            setPhase({ status: "checking" });
+            return createSession(initialPrompts);
+          case "downloadable":
+          case "downloading":
+            setPhase({ status: "downloading", progress: 0 });
+            return createSession(initialPrompts, true);
+          case "unavailable":
+            // Attempt create() so Chrome surfaces the precise hardware/storage reason if any
+            return createSession(initialPrompts);
+        }
+      } catch (err) {
+        console.error(err);
+        const aiErr = toAiError(err);
+        setPhase({ status: "error", error: aiErr });
+        setError(aiErr);
+        return null;
+      }
+    },
+    [createSession, modelOptions],
+  );
 
   useEffect(() => {
-    let cancelled = false;
-
-    if (autoInitialize) {
-      const initialize = async () => {
-        if (typeof LanguageModel === "undefined") {
-          if (!cancelled) setPhase({ status: "unavailable" });
-          return;
-        }
-
-        try {
-          const status = await LanguageModel.availability(modelOptions);
-          if (cancelled) return;
-
-          switch (status) {
-            case "available":
-              setPhase({ status: "checking" });
-              await createSession();
-              break;
-            case "downloadable":
-            case "downloading":
-              setPhase({ status: "downloading", progress: 0 });
-              await createSession(undefined, true);
-              break;
-            case "unavailable":
-              await createSession();
-              break;
-          }
-        } catch (err) {
-          if (cancelled) return;
-          console.error(err);
-          const aiErr = toAiError(err);
-          setPhase({ status: "error", error: aiErr });
-          setError(aiErr);
-        }
-      };
-
-      void initialize();
-    }
-
     return () => {
-      cancelled = true;
       generationIdRef.current += 1;
       abortRef.current?.abort();
       sessionRef.current?.destroy();
       sessionRef.current = null;
     };
-  }, [autoInitialize, createSession, modelOptions]);
+  }, []);
 
   const promptStreaming = useCallback(
     async (
@@ -399,13 +347,11 @@ export function usePromptAPI(options: PromptApiOptions = {}) {
     isReady,
     isGenerating,
     error,
-    sessionRef,
     contextUsage: contextStats?.usage ?? 0,
     contextWindow: contextStats?.window ?? 0,
     contextPercent,
     statusLabel: getPromptApiStatusLabel(phase, isGenerating, contextPercent),
-    init,
-    createSession,
+    initialize,
     prompt,
     promptStreaming,
     stop,

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { PORTFOLIO_SANITIZER, sanitizeHtml } from "../_lib/html-sanitizer";
-import { DEFAULT_MODEL_OPTIONS, usePromptAPI } from "./usePromptAPI";
+import { usePromptAPI } from "./usePromptAPI";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -48,7 +48,6 @@ export function usePortfolioAi() {
   const [suggestions, setSuggestions] = useState<string[]>([]);
 
   const promptApi = usePromptAPI({
-    autoInitialize: false,
     autoReloadOnDownload: true,
   });
 
@@ -61,7 +60,7 @@ export function usePortfolioAi() {
     contextWindow,
     contextPercent,
     statusLabel,
-    createSession,
+    initialize,
     promptStreaming,
     stop,
     reset,
@@ -72,25 +71,16 @@ export function usePortfolioAi() {
     let cancelled = false;
 
     const boot = async () => {
-      if (typeof LanguageModel === "undefined") {
-        await createSession();
-        return;
-      }
-
       try {
-        const [source, status] = await Promise.all([
-          fetch("/portfolio.md").then((r) => {
-            if (!r.ok) throw new Error("The portfolio could not be loaded.");
-            return r.text();
-          }),
-          LanguageModel.availability(DEFAULT_MODEL_OPTIONS),
-        ]);
+        const source = await fetch("/portfolio.md").then((response) => {
+          if (!response.ok) throw new Error("The portfolio could not be loaded.");
+          return response.text();
+        });
 
         if (cancelled) return;
 
-        const session = await createSession(
+        const session = await initialize(
           [{ role: "system", content: `${SYSTEM_PROMPT}\n${source}` }],
-          status === "downloadable" || status === "downloading",
         );
 
         if (!session || cancelled) return;
@@ -124,7 +114,7 @@ export function usePortfolioAi() {
     return () => {
       cancelled = true;
     };
-  }, [createSession]);
+  }, [initialize]);
 
   const generateAnswer = useCallback(
     async (requestedQuestion: string) => {
