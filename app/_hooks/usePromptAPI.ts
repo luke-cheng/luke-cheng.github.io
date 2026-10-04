@@ -63,9 +63,8 @@ export function getPromptApiStatusLabel(
       return `Downloading local model (${percentage}%)`;
     }
     case "unavailable":
-      return "Prompt API unavailable";
     case "error":
-      return "Prompt API setup failed";
+      return "Prompt API unavailable";
     case "ready":
       return isGenerating
         ? `Generating… (${contextPercent}%)`

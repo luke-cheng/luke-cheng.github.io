@@ -31,9 +31,9 @@ function SiteFooter() {
         </a>
         <a
           href="/portfolio.md"
-          download="Luke_Cheng-CV.md"
-          aria-label="Download Luke Cheng CV"
-          title="Download Luke_Cheng-CV.md"
+          // download="Luke_Cheng-CV.md"
+          aria-label="Luke Cheng CV"
+          title="Luke_Cheng-CV.md"
         >
           <ReadCvLogoIcon fontSize="inherit" aria-hidden="true" />
         </a>
