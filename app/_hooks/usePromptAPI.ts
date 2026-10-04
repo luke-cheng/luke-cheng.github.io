@@ -64,7 +64,7 @@ export function getPromptApiStatusLabel(
     }
     case "unavailable":
     case "error":
-      return "Prompt API unavailable";
+      return "On-device AI unavailable";
     case "ready":
       return isGenerating
         ? `Generating… (${contextPercent}%)`
