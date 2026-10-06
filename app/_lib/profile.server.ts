@@ -25,7 +25,8 @@ function pickSections(markdown: string, titles: string[]) {
 }
 
 export async function getProfileSection(page: ProfilePage) {
-  const portfolio = await readFile(path.join(process.cwd(), "public", "portfolio.md"), "utf8");
+  const contentDirectory = path.resolve(process.cwd(), process.env.CONTENT_DIR ?? "content-source");
+  const portfolio = await readFile(path.join(contentDirectory, "LukeCheng.md"), "utf8");
   const source = pickSections(portfolio, SECTION_TITLES[page]);
 
   return { source, staticHtml: renderMarkdown(source) };

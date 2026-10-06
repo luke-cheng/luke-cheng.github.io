@@ -13,7 +13,18 @@ Routes live in `app/`; shared UI, browser hooks, and build-time blog data are or
 - `/thoughts/` — blog index, newest first
 - `/thoughts/[slug]/` — an individual draft, expanded in the visitor's browser when Chrome's on-device AI is available
 
-Blog routes and their draft HTML are generated from `public/blog` at build time. The site can be hosted as static files; it does not require a running Next.js server. Browser AI can expand each draft in the visitor's browser.
+Blog routes and their draft HTML are generated at build time from `blogs/` in [`luke-cheng/luke-cheng`](https://github.com/luke-cheng/luke-cheng). That repository is also the source of `LukeCheng.md`. The Pages workflow checks it out to the ignored `content-source/` directory, uses it to generate the static pages, and publishes one copy as `/portfolio.md` for the browser's on-device AI. The site can be hosted as static files; it does not require a running Next.js server.
+
+## Publishing content
+
+Updating `LukeCheng.md` or a Markdown file under `blogs/` in the content repository sends a `content-updated` repository-dispatch event here. The Pages workflow then downloads those files before it builds the static site. The content repository needs a `PAGES_REPOSITORY_DISPATCH_TOKEN` Actions secret containing a fine-grained personal access token that can dispatch to `luke-cheng/luke-cheng.github.io`.
+
+For local builds, clone the content repository into `content-source/`, or point `CONTENT_DIR` at an existing checkout:
+
+```sh
+git clone https://github.com/luke-cheng/luke-cheng.git content-source
+CONTENT_DIR=content-source npm run build
+```
 
 ## Development
 

@@ -9,7 +9,11 @@ export type BlogPost = {
   filename: string;
 };
 
-const blogDirectory = path.join(process.cwd(), "public", "blog");
+// Content is checked out by the Pages workflow from luke-cheng/luke-cheng.
+// Keeping it outside public prevents the source Markdown from becoming part of
+// the site artifact except where a page deliberately renders it.
+const contentDirectory = path.resolve(process.cwd(), process.env.CONTENT_DIR ?? "content-source");
+const blogDirectory = path.join(contentDirectory, "blogs");
 
 function readFrontMatter(markdown: string) {
   const match = markdown.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
@@ -25,7 +29,13 @@ function readFrontMatter(markdown: string) {
 }
 
 export async function getBlogPosts(): Promise<BlogPost[]> {
-  const files = (await readdir(blogDirectory)).filter((file) => file.endsWith(".md"));
+  let files: string[];
+  try {
+    files = (await readdir(blogDirectory)).filter((file) => file.endsWith(".md"));
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return [];
+    throw error;
+  }
   const posts = await Promise.all(
     files.map(async (filename): Promise<BlogPost> => {
       const markdown = await readFile(path.join(blogDirectory, filename), "utf8");

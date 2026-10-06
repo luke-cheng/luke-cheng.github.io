@@ -9,6 +9,11 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+  # Sent by luke-cheng/luke-cheng after its Markdown content changes.
+  repository_dispatch:
+    types:
+      - content-updated
+
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
@@ -26,10 +31,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
+
+      - name: Checkout published content
+        uses: actions/checkout@v7
+        with:
+          repository: luke-cheng/luke-cheng
+          # A repository_dispatch build receives the exact content commit.
+          # Manual/site-code builds use the current main branch instead.
+          ref: ${{ github.event.client_payload.sha || 'main' }}
+          path: content-source
+          persist-credentials: false
+          # Only fetch the Markdown used by the static build.
+          sparse-checkout: |
+            LukeCheng.md
+            blogs/**
+          sparse-checkout-cone-mode: false
+
+      - name: Publish the portfolio source for the browser AI
+        run: |
+          test -f content-source/LukeCheng.md
+          test -d content-source/blogs
+          cp content-source/LukeCheng.md public/portfolio.md
 
       - name: Install Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: 'npm'
@@ -39,10 +65,10 @@ jobs:
 
       - name: Setup Pages
         id: setup_pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Restore cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             .next/cache
@@ -53,10 +79,10 @@ jobs:
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
 
       - name: Build with Next.js
-        run: npm run build
+        run: CONTENT_DIR=content-source npm run build
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: ./out
 
@@ -69,4 +95,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
