@@ -39,7 +39,7 @@ jobs:
           repository: luke-cheng/luke-cheng
           # A repository_dispatch build receives the exact content commit.
           # Manual/site-code builds use the current main branch instead.
-          ref: ${{ github.event.client_payload.sha || 'main' }}
+          ref: ${{ github.event.client_payload.content_sha || github.event.client_payload.sha || 'main' }}
           path: content-source
           persist-credentials: false
           # Only fetch the Markdown used by the static build.
