@@ -56,12 +56,27 @@ function BlogPostPage({ post, draft, initialArticleHtml }: BlogPostPageProps) {
           return;
         }
 
-        const expanded = await session.prompt(
-          `Turn this blog draft into a complete article. Treat the draft as the wireframe: keep its central idea and point order, use clear section headings to develop the ideas, open with a concise framing paragraph, and end with a short synthesis. Preserve the author's direct, reflective voice. Keep every factual claim grounded in the draft. Do not invent events, examples, research, results, or personal details. Return Markdown only, with the supplied title as the H1.\n\nTitle: ${post.title}\nDescription: ${post.description}\n\nDraft wireframe:\n${draft}`,
+        const stream = session.promptStreaming(
+          `Turn this draft into a complete blog post. provided is an extremely rough draft, you'll need to restructure and rewrite it. Keep its central idea close, use clear section headings to develop the ideas, keep it concise as we have tiny attention span in social media era. Return Markdown, with the supplied title as the H1.\n\nTitle: ${post.title}\nDescription: ${post.description}\n\nDraft:\n${draft}`,
         );
+        const reader = stream.getReader();
+        let expanded = "";
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            if (!active) return;
+
+            expanded += value;
+            setArticle(sanitizeHtml(renderMarkdown(expanded), MARKDOWN_SANITIZER));
+          }
+        } finally {
+          reader.releaseLock();
+        }
+
         if (active) {
           const sanitized = sanitizeHtml(renderMarkdown(expanded), MARKDOWN_SANITIZER);
-          setArticle(sanitized);
           setIsExpanded(true);
           try {
             sessionStorage.setItem(storageKey, sanitized);
@@ -91,8 +106,8 @@ function BlogPostPage({ post, draft, initialArticleHtml }: BlogPostPageProps) {
       <Link className="all-posts-link" href="/thoughts/">← All posts</Link>
       {isExpanding ? (
         <GenerationNotice
-          title={`Writing...`}
-          description="On-device AI is expanidng this draft into a full article"
+          title="Writing..."
+          description="On-device AI is streaming this draft into a full article"
         />
       ) : (
         <p className="eyebrow">{isExpanded ? "Article" : "Draft"}</p>

@@ -7,7 +7,7 @@ export default async function ThoughtsPage() {
   return (
     <main className="blog-index-page">
       <p className="eyebrow">Thoughts / Writing</p>
-      <h1>Working notes on systems, tools, and how to make things clearer.</h1>
+      <h1>Just some thoughts.</h1>
       <div className="post-list" aria-label="Blog posts, newest first">
         {posts.map((post) => (
           <Link
@@ -18,7 +18,6 @@ export default async function ThoughtsPage() {
             <time dateTime={post.date}>{post.date}</time>
             <h2>{post.title}</h2>
             <p>{post.description}</p>
-            <span>Read article →</span>
           </Link>
         ))}
       </div>

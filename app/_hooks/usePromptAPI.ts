@@ -67,8 +67,8 @@ export function getPromptApiStatusLabel(
       return "On-device AI unavailable";
     case "ready":
       return isGenerating
-        ? `Generating… (${contextPercent}%)`
-        : `on-device AI ready (${contextPercent}%)`;
+        ? `Generating… (memory used: ${contextPercent}%)`
+        : `on-device AI ready (memory used: ${contextPercent}%)`;
   }
 }
 
