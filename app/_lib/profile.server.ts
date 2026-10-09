@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import type { SitePage } from "../_components/SiteHeader";
-import { renderMarkdown } from "./markdown";
+import type { SitePage } from "@/app/_components/SiteHeader";
+import { renderMarkdown } from "@/app/_lib/markdown";
 
 export type ProfilePage = Exclude<SitePage, "home" | "thoughts">;
 
@@ -26,7 +26,13 @@ function pickSections(markdown: string, titles: string[]) {
 
 export async function getProfileSection(page: ProfilePage) {
   const contentDirectory = path.resolve(process.cwd(), process.env.CONTENT_DIR ?? "content-source");
-  const portfolio = await readFile(path.join(contentDirectory, "LukeCheng.md"), "utf8");
+  let portfolio: string;
+  try {
+    portfolio = await readFile(path.join(contentDirectory, "LukeCheng.md"), "utf8");
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+    portfolio = "";
+  }
   const source = pickSections(portfolio, SECTION_TITLES[page]);
 
   return { source, staticHtml: renderMarkdown(source) };

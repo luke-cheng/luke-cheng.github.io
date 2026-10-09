@@ -45,7 +45,7 @@ function PortfolioControls(props: PortfolioAssistantProps) {
           placeholder={
             isReady
               ? "Ask me anything about Luke..."
-              : "Preparing on-device AI..."
+              : "Preparing local AI..."
           }
           aria-label="Ask the portfolio a question"
           disabled={!isReady || isGenerating}

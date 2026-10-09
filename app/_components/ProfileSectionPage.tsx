@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import GenerationNotice from "./GenerationNotice";
-import type { ProfilePage } from "../_lib/profile.server";
-import { renderMarkdown } from "../_lib/markdown";
-import { MARKDOWN_SANITIZER, sanitizeHtml } from "../_lib/html-sanitizer";
+import GenerationNotice from "@/app/_components/GenerationNotice";
+import type { ProfilePage } from "@/app/_lib/profile.server";
+import { renderMarkdown } from "@/app/_lib/markdown";
+import { MARKDOWN_SANITIZER, sanitizeHtml } from "@/app/_lib/html-sanitizer";
 
 type ProfileSectionPageProps = {
   page: ProfilePage;
@@ -62,8 +62,8 @@ function ProfileSectionPage({ page, source, staticHtml }: ProfileSectionPageProp
       <h1>{intro}</h1>
       {isGenerating && (
         <GenerationNotice
-          title={`Tailoring ${title.toLowerCase()}...`}
-          description="On-device AI is working on this section"
+          title="Your browser is working on it..."
+          description={`Local AI is giving your ${title.toLowerCase()} page a clearer shape.`}
         />
       )}
       <article dangerouslySetInnerHTML={{ __html: content }} />

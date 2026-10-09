@@ -118,6 +118,7 @@ button:focus-visible {
   flex: 0 0 auto;
   color: var(--muted);
   font-size: 10px;
+  white-space: nowrap;
 }
 .status-dot {
   display: inline-block;
@@ -446,11 +447,11 @@ button:focus-visible {
   justify-content: space-between;
   gap: 25px;
   position: fixed;
-  right: 0;
+  right: max(4vw, calc((100vw - 1440px) / 2 + 4vw));
   bottom: 0;
-  left: 0;
+  left: max(4vw, calc((100vw - 1440px) / 2 + 4vw));
   z-index: 3;
-  padding: 13px 4vw;
+  padding: 13px 0;
   border-top: 1px solid var(--ink);
   background: var(--paper);
   font-size: 11px;
@@ -662,6 +663,8 @@ button:focus-visible {
   }
   .model-status {
     align-self: flex-start;
+    max-width: 7px;
+    font-size: 0;
   }
   .tab-nav {
     gap: 20px;
@@ -704,7 +707,9 @@ button:focus-visible {
     align-items: flex-start;
     flex-direction: column;
     gap: 8px;
-    padding: 12px 20px;
+    left: 20px;
+    right: 20px;
+    padding: 12px 0;
   }
   .inline-error {
     right: 20px;

@@ -55,20 +55,20 @@ export function getPromptApiStatusLabel(
 ): string {
   switch (phase.status) {
     case "checking":
-      return "Checking local model";
+      return "Checking local AI";
     case "downloadable":
     case "downloading": {
       const percentage =
         (phase.progress <= 1 ? phase.progress * 100 : phase.progress) | 0;
-      return `Downloading local model (${percentage}%)`;
+      return `Downloading local AI (${percentage}%)`;
     }
     case "unavailable":
     case "error":
-      return "On-device AI unavailable";
+      return "Local AI unavailable";
     case "ready":
       return isGenerating
-        ? `Generating… (memory used: ${contextPercent}%)`
-        : `on-device AI ready (memory used: ${contextPercent}%)`;
+        ? `Working... (${contextPercent}% used)`
+        : `Local AI ready (${contextPercent}% used)`;
   }
 }
 

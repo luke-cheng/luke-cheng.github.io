@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { PORTFOLIO_SANITIZER, sanitizeHtml } from "../_lib/html-sanitizer";
-import { usePromptAPI } from "./usePromptAPI";
+import { PORTFOLIO_SANITIZER, sanitizeHtml } from "@/app/_lib/html-sanitizer";
+import { usePromptAPI } from "@/app/_hooks/usePromptAPI";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -17,9 +17,9 @@ const SUGGESTIONS_SCHEMA = {
   required: ["questions"],
 };
 
-const INIT_CANVAS = `<article class="landing-canvas"><p class="eyebrow">Luke Cheng</p><h1>Programmer by trade.<br/>
+const INIT_CANVAS = `<article class="landing-canvas"><p class="eyebrow">Luke Cheng</p><h1>
+Programmer by trade.<br/>
 Chemist by training.<br/>
-Philosopher by heart.<br/>
 Driven by curiosity about how our worlds work.</h1><p>Use the navigation above to explore or ask a question.</p></article>`;
 
 const SYSTEM_PROMPT = `You are the local portfolio editor for Luke Cheng. The complete source of truth is the portfolio markdown supplied below. Never invent facts, companies, dates, metrics, technologies, links, or responsibilities. You may make the presentation surprising and editorial, but every factual claim must be traceable to the source.

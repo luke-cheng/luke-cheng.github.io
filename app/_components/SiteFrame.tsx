@@ -2,10 +2,10 @@
 
 import type { ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { usePortfolioAi } from "../_hooks/usePortfolioAi";
-import SiteFooter from "./SiteFooter";
-import SiteHeader, { type SitePage } from "./SiteHeader";
-import { PortfolioAiContext } from "./PortfolioAiContext";
+import { usePortfolioAi } from "@/app/_hooks/usePortfolioAi";
+import SiteFooter from "@/app/_components/SiteFooter";
+import SiteHeader, { type SitePage } from "@/app/_components/SiteHeader";
+import { PortfolioAiContext } from "@/app/_components/PortfolioAiContext";
 
 function getCurrentPage(pathname: string): SitePage {
   if (pathname.startsWith("/work")) return "work";

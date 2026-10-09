@@ -44,7 +44,11 @@ function BlogPostPage({ post, draft, initialArticleHtml }: BlogPostPageProps) {
       }
 
       if (typeof LanguageModel === "undefined") {
-        if (active) setExpansionError("On-device AI is unavailable in this browser.");
+        if (active) {
+          setExpansionError(
+            "Your browser's on-device AI is unavailable, so this draft is shown as-is.",
+          );
+        }
         return;
       }
 
@@ -57,7 +61,7 @@ function BlogPostPage({ post, draft, initialArticleHtml }: BlogPostPageProps) {
         }
 
         const stream = session.promptStreaming(
-          `Turn this draft into a complete blog post. provided is an extremely rough draft, you'll need to restructure and rewrite it. Keep its central idea close, use clear section headings to develop the ideas, keep it concise as we have tiny attention span in social media era. Return Markdown, with the supplied title as the H1.\n\nTitle: ${post.title}\nDescription: ${post.description}\n\nDraft:\n${draft}`,
+          `Turn this draft into a complete blog post. provided is a rough draft, you'll need to restructure and rewrite it. Keep its central idea close, use clear section headings to develop the ideas, keep it concise as we have tiny attention span in social media era. Return Markdown, with the supplied title as the H1.\n\nTitle: ${post.title}\nDescription: ${post.description}\n\nDraft:\n${draft}`,
         );
         const reader = stream.getReader();
         let expanded = "";
@@ -107,7 +111,7 @@ function BlogPostPage({ post, draft, initialArticleHtml }: BlogPostPageProps) {
       {isExpanding ? (
         <GenerationNotice
           title="Writing..."
-          description="On-device AI is streaming this draft into a full article"
+          description="Turning this draft into a real article."
         />
       ) : (
         <p className="eyebrow">{isExpanded ? "Article" : "Draft"}</p>

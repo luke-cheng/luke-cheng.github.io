@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import type { usePortfolioAi } from "../_hooks/usePortfolioAi";
+import type { usePortfolioAi } from "@/app/_hooks/usePortfolioAi";
 
 export type PortfolioAiState = ReturnType<typeof usePortfolioAi>;
 

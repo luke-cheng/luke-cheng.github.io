@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import BlogPostPage from "../../_components/BlogPostPage";
-import { getBlogPost, getBlogPosts } from "../../_lib/blog.server";
-import { renderMarkdown, stripFrontMatter } from "../../_lib/markdown";
+import BlogPostPage from "@/app/_components/BlogPostPage";
+import { getBlogPost, getBlogPosts } from "@/app/_lib/blog.server";
+import { renderMarkdown, stripFrontMatter } from "@/app/_lib/markdown";
 
 type BlogPostRouteProps = {
   params: Promise<{ slug: string }>;
@@ -12,7 +12,7 @@ export const dynamicParams = false;
 
 export async function generateStaticParams() {
   const posts = await getBlogPosts();
-  return posts.map((post) => ({ slug: post.slug }));
+  return posts.length > 0 ? posts.map((post) => ({ slug: post.slug })) : [{ slug: "__empty__" }];
 }
 
 export async function generateMetadata({ params }: BlogPostRouteProps): Promise<Metadata> {

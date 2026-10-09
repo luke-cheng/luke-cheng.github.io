@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getBlogPosts } from "../_lib/blog.server";
+import { getBlogPosts } from "@/app/_lib/blog.server";
 
 export default async function ThoughtsPage() {
   const posts = await getBlogPosts();
@@ -7,7 +7,7 @@ export default async function ThoughtsPage() {
   return (
     <main className="blog-index-page">
       <p className="eyebrow">Thoughts / Writing</p>
-      <h1>Just some thoughts.</h1>
+      <h1>Some thoughts.</h1>
       <div className="post-list" aria-label="Blog posts, newest first">
         {posts.map((post) => (
           <Link
