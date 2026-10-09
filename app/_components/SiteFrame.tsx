@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { usePortfolioAi } from "@/app/_hooks/usePortfolioAi";
+import FloatingChatBar from "@/app/_components/FloatingChatBar";
 import SiteFooter from "@/app/_components/SiteFooter";
 import SiteHeader, { type SitePage } from "@/app/_components/SiteHeader";
 import { PortfolioAiContext } from "@/app/_components/PortfolioAiContext";
@@ -35,21 +36,19 @@ function SiteFrame({ children }: { children: ReactNode }) {
   return (
     <PortfolioAiContext.Provider value={ai}>
       <div className={`site-shell ${ai.isGenerating ? "is-generating" : ""}`}>
-        <SiteHeader
-          page={page}
-          assistant={{
-            question: ai.question,
-            suggestions: ai.suggestions,
-            statusLabel: ai.statusLabel,
-            isReady: ai.isReady,
-            isGenerating: ai.isGenerating,
-            onQuestionChange: ai.onQuestionChange,
-            onQuestion,
-            onSuggestionSelect,
-            onStop: ai.onStop,
-          }}
-        />
+        <SiteHeader page={page} />
         {children}
+        <FloatingChatBar
+          question={ai.question}
+          suggestions={ai.suggestions}
+          statusLabel={ai.statusLabel}
+          isReady={ai.isReady}
+          isGenerating={ai.isGenerating}
+          onQuestionChange={ai.onQuestionChange}
+          onQuestion={onQuestion}
+          onSuggestionSelect={onSuggestionSelect}
+          onStop={ai.onStop}
+        />
         {ai.generationError && (
           <div className="inline-error" role="alert">
             <strong>{ai.generationError.name}:</strong> {ai.generationError.message}
