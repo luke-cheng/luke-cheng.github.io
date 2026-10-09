@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { PaperPlaneTiltIcon, StopIcon, SparkleIcon } from "@phosphor-icons/react";
 
-export type SitePage = "home" | "work" | "interests" | "thoughts";
+export type SitePage = "chat" | "work" | "interests" | "thoughts";
 
 export type PortfolioAssistantProps = {
   question: string;
@@ -98,6 +98,14 @@ function StaticNavigation({ page }: { page: SiteHeaderProps["page"] }) {
   return (
     <>
       <Link
+        className={`ui-button ui-button--tab ${page === "chat" ? "active" : ""}`}
+        href="/chat/"
+        aria-current={page === "chat" ? "page" : undefined}
+      >
+        <span>00</span>
+        AI Chat
+      </Link>
+      <Link
         className={`ui-button ui-button--tab ${page === "work" ? "active" : ""}`}
         href="/work/"
         aria-current={page === "work" ? "page" : undefined}
@@ -126,17 +134,30 @@ function StaticNavigation({ page }: { page: SiteHeaderProps["page"] }) {
 }
 
 function SiteHeader(props: SiteHeaderProps) {
+  const { assistant } = props;
+
   return (
     <header className="site-header">
       <div className="header-top">
-        <Link className="ui-button ui-button--identity" href="/">
-          <strong>Luke Cheng</strong>
-        </Link>
+        <div className="identity-group">
+          <Link className="ui-button ui-button--identity" href="/chat/">
+            <strong>Luke Cheng</strong>
+          </Link>
+          <form className="title-chat-launch" onSubmit={assistant.onQuestion}>
+            <input
+              value={assistant.question}
+              onChange={(event) => assistant.onQuestionChange(event.target.value)}
+              placeholder="Ask and open AI chat"
+              aria-label="Ask and open AI chat session"
+              disabled={assistant.isGenerating}
+            />
+          </form>
+        </div>
         <nav className="tab-nav" aria-label="Site navigation">
           <StaticNavigation page={props.page} />
         </nav>
       </div>
-      <PortfolioControls {...props.assistant} />
+      <PortfolioControls {...assistant} />
     </header>
   );
 }

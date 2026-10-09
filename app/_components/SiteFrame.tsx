@@ -11,7 +11,7 @@ function getCurrentPage(pathname: string): SitePage {
   if (pathname.startsWith("/work")) return "work";
   if (pathname.startsWith("/interests")) return "interests";
   if (pathname.startsWith("/thoughts")) return "thoughts";
-  return "home";
+  return "chat";
 }
 
 function SiteFrame({ children }: { children: ReactNode }) {
@@ -21,15 +21,15 @@ function SiteFrame({ children }: { children: ReactNode }) {
   const page = getCurrentPage(pathname);
 
   const onQuestion = (event: React.SyntheticEvent<HTMLFormElement>) => {
-    const shouldOpenCanvas = ai.isReady && Boolean(ai.question.trim());
+    const shouldOpenChat = Boolean(ai.question.trim());
     ai.onQuestion(event);
-    if (shouldOpenCanvas && pathname !== "/") router.push("/");
+    if (shouldOpenChat && pathname !== "/chat") router.push("/chat");
   };
 
   const onSuggestionSelect = (question: string) => {
     if (!ai.isReady || ai.isGenerating) return;
     ai.onSuggestionSelect(question);
-    if (pathname !== "/") router.push("/");
+    if (pathname !== "/chat") router.push("/chat");
   };
 
   return (

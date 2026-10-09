@@ -101,6 +101,27 @@ button:focus-visible {
   text-align: left;
   text-decoration: none;
 }
+.identity-group {
+  display: grid;
+  gap: 8px;
+}
+.title-chat-launch input {
+  width: min(420px, 70vw);
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  padding: 4px 0;
+  color: var(--ink);
+  font: 11px var(--mono);
+  letter-spacing: 0.06em;
+}
+.title-chat-launch input::placeholder {
+  color: var(--muted);
+}
+.title-chat-launch input:focus-visible {
+  outline: 0;
+  border-bottom-color: var(--coral);
+}
 .eyebrow,
 .model-status,
 .tab-nav span {
@@ -651,6 +672,9 @@ button:focus-visible {
     align-items: flex-start;
     flex-direction: column;
     gap: 24px;
+  }
+  .title-chat-launch input {
+    width: 100%;
   }
   .header-bottom {
     align-items: stretch;
