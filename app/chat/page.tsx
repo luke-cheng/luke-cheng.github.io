@@ -2,6 +2,6 @@
 
 import ChatSessionPage from "@/app/_components/ChatSessionPage";
 
-export default function HomePage() {
+export default function ChatPage() {
   return <ChatSessionPage />;
 }

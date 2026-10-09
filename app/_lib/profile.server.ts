@@ -1,9 +1,8 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import type { SitePage } from "@/app/_components/SiteHeader";
 import { renderMarkdown } from "@/app/_lib/markdown";
 
-export type ProfilePage = Exclude<SitePage, "home" | "thoughts">;
+export type ProfilePage = "work" | "interests";
 
 const SECTION_TITLES: Record<ProfilePage, string[]> = {
   work: ["Experience"],

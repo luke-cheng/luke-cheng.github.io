@@ -46,6 +46,7 @@ export function usePortfolioAi() {
   const [canvas, setCanvas] = useState(INIT_CANVAS);
   const [question, setQuestion] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [hasChatted, setHasChatted] = useState(false);
 
   const promptApi = usePromptAPI({
     autoReloadOnDownload: true,
@@ -121,6 +122,8 @@ export function usePortfolioAi() {
       const request = `Answer the visitor's question directly: "${requestedQuestion}" Use the portfolio source as your only evidence. Explain the relevant connections, reasoning, or tradeoffs when the source supports them. Do not merely list experience. Present the answer as a thoughtful, focused portfolio canvas in semantic HTML. Return semantic HTML only.`;
 
       try {
+        setHasChatted(true);
+        setCanvas("");
         await promptStreaming(request, {
           onChunk: (_chunk, cumulative) => {
             setCanvas(sanitizeCanvas(cumulative));
@@ -157,6 +160,8 @@ export function usePortfolioAi() {
   return {
     phase,
     canvas,
+    initialCanvas: INIT_CANVAS,
+    hasChatted,
     question,
     suggestions,
     isReady,
