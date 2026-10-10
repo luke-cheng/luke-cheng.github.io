@@ -1,9 +1,8 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import type { SitePage } from "@/app/_components/SiteHeader";
 import { renderMarkdown } from "@/app/_lib/markdown";
 
-export type ProfilePage = Exclude<SitePage, "home" | "thoughts">;
+export type ProfilePage = "work" | "interests";
 
 const SECTION_TITLES: Record<ProfilePage, string[]> = {
   work: ["Experience"],
@@ -31,7 +30,10 @@ export async function getProfileSection(page: ProfilePage) {
     portfolio = await readFile(path.join(contentDirectory, "LukeCheng.md"), "utf8");
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
-    portfolio = "";
+    // Local checkouts do not necessarily include the ignored content repository.
+    // The deployment copies the same source to public/portfolio.md for the browser
+    // AI, so use it as a static-page fallback during local development.
+    portfolio = await readFile(path.join(process.cwd(), "public", "portfolio.md"), "utf8");
   }
   const source = pickSections(portfolio, SECTION_TITLES[page]);
 

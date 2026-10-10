@@ -1,131 +1,56 @@
+"use client";
+
 import Link from "next/link";
-import { PaperPlaneTiltIcon, StopIcon, SparkleIcon } from "@phosphor-icons/react";
+import { usePathname } from "next/navigation";
+import { BriefcaseIcon, ChatCircleDotsIcon, LightbulbIcon, PersonSimpleSkiIcon } from "@phosphor-icons/react";
 
-export type SitePage = "home" | "work" | "interests" | "thoughts";
+type SitePage = "home" | "work" | "interests" | "thoughts" | "chat";
 
-export type PortfolioAssistantProps = {
-  question: string;
-  suggestions: string[];
-  statusLabel: string;
-  isReady: boolean;
-  isGenerating: boolean;
-  onQuestionChange: (question: string) => void;
-  onQuestion: (event: React.SyntheticEvent<HTMLFormElement>) => void;
-  onSuggestionSelect: (question: string) => void;
-  onStop: () => void;
-};
-
-export type SiteHeaderProps = {
-  page: SitePage;
-  assistant: PortfolioAssistantProps;
-};
-
-function PortfolioControls(props: PortfolioAssistantProps) {
-  const {
-    question,
-    suggestions,
-    statusLabel,
-    isReady,
-    isGenerating,
-    onQuestionChange,
-    onQuestion,
-    onSuggestionSelect,
-    onStop,
-  } = props;
-
-  return (
-    <div className="header-bottom">
-      <form className="question-bar" onSubmit={onQuestion}>
-        <span className="prompt-symbol" aria-hidden="true">
-          <SparkleIcon fontSize="inherit" />
-        </span>
-        <input
-          value={question}
-          onChange={(event) => onQuestionChange(event.target.value)}
-          placeholder={
-            isReady
-              ? "Ask me anything about Luke..."
-              : "Preparing local AI..."
-          }
-          aria-label="Ask the portfolio a question"
-          disabled={!isReady || isGenerating}
-        />
-        <span className="model-status">
-          <span className={`status-dot ${isReady ? "ready" : ""}`} />
-          {statusLabel}
-        </span>
-        {isGenerating ? (
-          <button
-            className="ui-button ui-button--icon ui-button--stop"
-            type="button"
-            aria-label="Stop generating"
-            title="Stop generating"
-            onClick={onStop}
-          >
-            <StopIcon fontSize="inherit" aria-hidden="true" />
-          </button>
-        ) : (
-          <button
-            className="ui-button ui-button--icon ui-button--submit"
-            type="submit"
-            aria-label="Ask question"
-            disabled={!isReady || !question.trim()}
-          >
-            <PaperPlaneTiltIcon fontSize="inherit" aria-hidden="true" />
-          </button>
-        )}
-      </form>
-      {suggestions.length > 0 && (
-        <div className="question-suggestions" aria-label="Suggested questions">
-          {suggestions.map((suggestion) => (
-            <button
-              key={suggestion}
-              className="ui-button ui-button--pill"
-              type="button"
-              onClick={() => onSuggestionSelect(suggestion)}
-              disabled={!isReady || isGenerating}
-            >
-              {suggestion}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+function getCurrentPage(pathname: string): SitePage {
+  if (pathname.startsWith("/work")) return "work";
+  if (pathname.startsWith("/interests")) return "interests";
+  if (pathname.startsWith("/thoughts")) return "thoughts";
+  if (pathname.startsWith("/chat")) return "chat";
+  return "home";
 }
 
-function StaticNavigation({ page }: { page: SiteHeaderProps["page"] }) {
+function StaticNavigation({ page }: { page: SitePage }) {
   return (
     <>
+      <Link
+        className={`ui-button ui-button--tab ${page === "chat" ? "active" : ""}`}
+        href="/chat/"
+        aria-current={page === "chat" ? "page" : undefined}>
+        <ChatCircleDotsIcon /> Chat
+      </Link>
       <Link
         className={`ui-button ui-button--tab ${page === "work" ? "active" : ""}`}
         href="/work/"
         aria-current={page === "work" ? "page" : undefined}
       >
-        <span>01</span>
-        Work
+        <BriefcaseIcon /> Work
       </Link>
       <Link
         className={`ui-button ui-button--tab ${page === "interests" ? "active" : ""}`}
         href="/interests/"
         aria-current={page === "interests" ? "page" : undefined}
       >
-        <span>02</span>
-        Interests
+        <PersonSimpleSkiIcon /> Interests
       </Link>
       <Link
         className={`ui-button ui-button--tab ${page === "thoughts" ? "active" : ""}`}
         href="/thoughts/"
         aria-current={page === "thoughts" ? "page" : undefined}
       >
-        <span>03</span>
-        Thoughts
+        <LightbulbIcon /> Thoughts
       </Link>
     </>
   );
 }
 
-function SiteHeader(props: SiteHeaderProps) {
+function SiteHeader() {
+  const page = getCurrentPage(usePathname() ?? "/");
+
   return (
     <header className="site-header">
       <div className="header-top">
@@ -133,10 +58,9 @@ function SiteHeader(props: SiteHeaderProps) {
           <strong>Luke Cheng</strong>
         </Link>
         <nav className="tab-nav" aria-label="Site navigation">
-          <StaticNavigation page={props.page} />
+          <StaticNavigation page={page} />
         </nav>
       </div>
-      <PortfolioControls {...props.assistant} />
     </header>
   );
 }
