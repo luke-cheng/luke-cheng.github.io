@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { PORTFOLIO_SANITIZER, sanitizeHtml } from "@/app/_lib/html-sanitizer";
+import { MARKDOWN_SANITIZER, sanitizeHtml } from "@/app/_lib/html-sanitizer";
+import { renderMarkdown } from "@/app/_lib/markdown";
 import { usePromptAPI } from "@/app/_hooks/usePromptAPI";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -17,27 +18,17 @@ const SUGGESTIONS_SCHEMA = {
   required: ["questions"],
 };
 
-const INIT_CANVAS = `<article class="landing-canvas"><p class="eyebrow">Luke Cheng</p><h1>
-Programmer by trade.<br/>
-Chemist by training.<br/>
-Driven by curiosity about how our worlds work.</h1><p>Use the navigation above to explore, or start a chat.</p></article>`;
-
 const SYSTEM_PROMPT = `You are the local portfolio editor for Luke Cheng. The complete source of truth is the portfolio markdown supplied below. Never invent facts, companies, dates, metrics, technologies, links, or responsibilities. You may make the presentation surprising and editorial, but every factual claim must be traceable to the source.
 
-For canvas requests, return only semantic HTML and inline style attributes for layout. Make the composition feel like a thoughtful personal website, not a generic resume.
-
-Structure every canvas response in a concise conversation flow.
+Answer visitor questions as concise, natural conversation replies in Markdown. Never return HTML.
 
 Portfolio source:
 `;
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function sanitizeCanvas(html: string): string {
-  const withoutFences = html
-    .replace(/^\s*```(?:html)?\s*/i, "")
-    .replace(/\s*```\s*$/i, "");
-  return sanitizeHtml(withoutFences, PORTFOLIO_SANITIZER);
+function renderChatMarkdown(markdown: string): string {
+  return sanitizeHtml(renderMarkdown(markdown), MARKDOWN_SANITIZER);
 }
 
 export type ChatMessage = {
@@ -55,7 +46,6 @@ export type ChatPageContext = {
 // ─── Hook ────────────────────────────────────────────────────────────────────
 
 export function usePortfolioAi() {
-  const [canvas, setCanvas] = useState(INIT_CANVAS);
   const [question, setQuestion] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -65,18 +55,13 @@ export function usePortfolioAi() {
   });
 
   const {
-    phase,
     isReady,
     isGenerating,
     error: generationError,
-    contextUsage,
-    contextWindow,
-    contextPercent,
     statusLabel,
     initialize,
     promptStreaming,
     stop,
-    reset,
     clearError,
   } = promptApi;
 
@@ -131,7 +116,7 @@ export function usePortfolioAi() {
 
   const generateAnswer = useCallback(
     async (requestedQuestion: string, pageContext: ChatPageContext) => {
-      const request = `The visitor started this chat from the ${pageContext.title} page (${pageContext.path}). That page is about: ${pageContext.summary}\n\nAnswer the visitor's question directly: "${requestedQuestion}" Use the portfolio source as your only evidence. Use the originating page only as context for the answer; do not claim it contains information it does not. Explain relevant connections, reasoning, or tradeoffs when the source supports them. Do not merely list experience. Present the answer as a thoughtful, focused portfolio canvas in semantic HTML. Return semantic HTML only.`;
+      const request = `The visitor started this chat from the ${pageContext.title} page (${pageContext.path}). That page is about: ${pageContext.summary}\n\nAnswer the visitor's question directly: "${requestedQuestion}" Use the portfolio source as your only evidence. Use the originating page only as context for the answer; do not claim it contains information it does not. Explain relevant connections, reasoning, or tradeoffs when the source supports them. Do not merely list experience. Return Markdown only.`;
       const assistantId = `assistant-${Date.now()}`;
       setMessages((current) => [
         ...current,
@@ -142,8 +127,7 @@ export function usePortfolioAi() {
       try {
         await promptStreaming(request, {
           onChunk: (_chunk, cumulative) => {
-            const response = sanitizeCanvas(cumulative);
-            setCanvas(response);
+            const response = renderChatMarkdown(cumulative);
             setMessages((current) => current.map((message) =>
               message.id === assistantId ? { ...message, content: response } : message,
             ));
@@ -177,23 +161,17 @@ export function usePortfolioAi() {
   );
 
   return {
-    phase,
-    canvas,
     messages,
     question,
     suggestions,
     isReady,
     isGenerating,
     generationError,
-    contextUsage,
-    contextWindow,
-    contextPercent,
     statusLabel,
     onQuestionChange: setQuestion,
     onQuestion: handleQuestion,
     onSuggestionSelect: handleSuggestionSelect,
     onStop: stop,
-    onReset: reset,
     onDismissError: clearError,
   };
 }

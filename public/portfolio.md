@@ -8,42 +8,25 @@
 
 > Dec 2025 – Present
 
-- Contributed to the query side of a CQRS-style centralized customer data platform, building the Customer Summary Utility to consolidate customer information from multiple internal systems and serve 10M+ daily requests (~10K TPS) with p99 latency below 200 ms using Spring Boot, Kafka, Cassandra, and CockroachDB.
-- Implemented a Change Data Capture design pattern to propagate database changes through lightweight Kafka events rather than transmitting full customer payloads, reducing messaging overhead and enabling lower-latency updates to the customer-read model.
-- Implemented reactive Kafka consumers with batch processing to asynchronously process customer-data changes at high throughput, keeping the query-side data model synchronized while reducing coupling between upstream systems and the customer-facing API.
-- Supported the platform's transition to Kubernetes-based infrastructure as traffic increased, improving horizontal scalability, deployment consistency, and operational reliability for high-throughput services.
-- Expanded automated testing across diverse customer datasets—including addresses, phone numbers, account-to-customer relationships, account identifiers, and card data—using JUnit and Cucumber, providing regression coverage for data-processing paths that could not be reliably exercised through UAT alone.
-- Extended the API and underlying data model to support multiple physical and virtual card numbers associated with a single account, enabling customer-data services to accommodate mobile-wallet and virtual-card use cases without relying on one-to-one account-to-card mappings.
-- Standardized deployment configuration across environments to improve consistency between test and production, reducing environment-specific configuration issues and increasing confidence in production releases.
-- Implemented Dynatrace SaaS observability to provide application and service-level visibility across the distributed platform, enabling developers to identify performance and health issues before diving into detailed Splunk logs.
-- Improved release safety through Helm-based Canary deployment and rollback strategies within Jenkins CI/CD pipelines, enabling controlled production releases and faster recovery from deployment issues.
-- Helped maintain operational continuity during a team transition by troubleshooting Kubernetes deployments, CI/CD workflows, configuration issues, and legacy service behavior while documenting system knowledge for continued development and support.
+- stub
 
 ### Co-Founder | MOYU LLC, Pittsburgh, PA
 
 > Feb 2023–Jan 2024
 
-- Founded an early-stage startup exploring semantic version control for CAD/BIM assets, addressing workflow limitations for complex engineering design files.
-- Developed cross-platform visualization and revision-diff tooling using Next.js, Electron, and Three.js for large-scale 2D and 3D architectural models.
-- Researched multi-module computer vision and geometric reasoning techniques for engineering design understanding to inform product strategy.
+- stub
 
 ### Graduate Software Developer | University of Pittsburgh Medical Center, Pittsburgh, PA
 
 > Feb 2023–Jan 2024
 
-- Built a HIPAA-compliant clinical analytics platform by translating requirements from 50+ clinicians into scalable healthcare software using Java, Spring Boot, MySQL, FHIR APIs, and AWS.
-- Developed Python NLP pipelines using spaCy, NLTK, and custom information extraction techniques to convert unstructured clinical notes into structured medical knowledge.
-- Designed semantic indexing and intelligent clinical search workflows to improve retrieval of medical information.
-- Deployed secure cloud infrastructure supporting high availability, regulatory compliance, and scalable healthcare data processing.
+- stub
 
 ### Research Scientist | ChemPacific Corp, Baltimore, MD
 
 > May 2021–May 2022
 
-- Applied data science techniques to laboratory manufacturing datasets, building Python workflows that improved process visibility and operational decision-making.
-- Designed automated laboratory data pipelines integrating Agilent analytical instrumentation with enterprise systems, improving traceability and reducing manual processing.
-- Performed statistical analysis, data validation, and process optimization across large experimental datasets supporting manufacturing quality and scientific research.
-- Automated laboratory workflows using Python and PowerShell, eliminating repetitive manual tasks and saving 150+ hours annually while maintaining GMP and NMPA compliance.
+- stub
 
 ## Education
 
