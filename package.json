@@ -11,22 +11,26 @@
   "dependencies": {
     "@mdx-js/loader": "^3.1.1",
     "@mdx-js/react": "^3.1.1",
-    "@next/mdx": "^16.3.8",
+    "@next/mdx": "16.5.0-canary.26",
     "@phosphor-icons/react": "^2.1.10",
     "@types/mdx": "^2.0.14",
     "marked": "^18.0.12",
-    "next": "16.3.8",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "next": "16.5.0-canary.26",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.0",
     "@types/dom-chromium-ai": "^0.0.17",
     "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.3.6",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.5.0-canary.26",
     "typescript": "^5"
+  },
+  "overrides": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0"
   }
 }
