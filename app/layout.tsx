@@ -1,3 +1,4 @@
+import { GoogleAnalytics } from '@next/third-parties/google';
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
@@ -16,6 +17,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
       <body>
         <SiteFrame>{children}</SiteFrame>
       </body>
+      <GoogleAnalytics gaId="G-27TDBYW7WW" />
     </html>
   );
 }
