@@ -51,6 +51,7 @@ jobs:
             LukeCheng.md
             blogs/**
           sparse-checkout-cone-mode: false
+          fetch-depth: 0
 
       - name: Publish the portfolio source for the browser AI
         run: |

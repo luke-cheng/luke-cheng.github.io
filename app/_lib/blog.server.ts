@@ -1,5 +1,7 @@
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 
 export type BlogPost = {
   slug: string;
@@ -14,6 +16,40 @@ export type BlogPost = {
 // the site artifact except where a page deliberately renders it.
 const contentDirectory = path.resolve(process.cwd(), process.env.CONTENT_DIR ?? "content-source");
 const blogDirectory = path.join(contentDirectory, "blogs");
+const execFileAsync = promisify(execFile);
+
+function slugToTitle(slug: string) {
+  return slug
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+async function getGitAddedDate(filename: string) {
+  try {
+    const { stdout } = await execFileAsync("git", [
+      "-C",
+      blogDirectory,
+      "log",
+      "--diff-filter=A",
+      "--follow",
+      "--format=%aI",
+      "--reverse",
+      "--",
+      filename,
+    ]);
+    const firstEntry = stdout
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .find(Boolean);
+    if (!firstEntry) return "";
+    const date = new Date(firstEntry);
+    if (Number.isNaN(date.getTime())) return "";
+    return date.toISOString().slice(0, 10);
+  } catch {
+    return "";
+  }
+}
 
 function readFrontMatter(markdown: string) {
   const match = markdown.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
@@ -41,10 +77,11 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
       const markdown = await readFile(path.join(blogDirectory, filename), "utf8");
       const data = readFrontMatter(markdown);
       const slug = filename.replace(/\.md$/i, "");
+      const gitDate = await getGitAddedDate(filename);
       return {
         slug,
-        title: data.title || slug.replace(/[-_]/g, " "),
-        date: data.date || "",
+        title: slugToTitle(slug),
+        date: gitDate,
         description: data.description || "A working note from Luke Cheng.",
         filename,
       };
