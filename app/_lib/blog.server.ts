@@ -1,5 +1,7 @@
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 
 export type BlogPost = {
   slug: string;
@@ -14,6 +16,35 @@ export type BlogPost = {
 // the site artifact except where a page deliberately renders it.
 const contentDirectory = path.resolve(process.cwd(), process.env.CONTENT_DIR ?? "content-source");
 const blogDirectory = path.join(contentDirectory, "blogs");
+const execFileAsync = promisify(execFile);
+
+function getTitleFromFilename(filename: string) {
+  return filename
+    .replace(/\.md$/i, "")
+    .replace(/[-_]/g, " ")
+    .trim();
+}
+
+async function getGitAddedDate(filePath: string) {
+  try {
+    const { stdout } = await execFileAsync("git", [
+      "log",
+      "--diff-filter=A",
+      "--follow",
+      "--format=%aI",
+      "--reverse",
+      "--",
+      filePath,
+    ]);
+    const firstCommitDate = stdout
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .find(Boolean);
+    return firstCommitDate ? firstCommitDate.slice(0, 10) : "";
+  } catch {
+    return "";
+  }
+}
 
 function readFrontMatter(markdown: string) {
   const match = markdown.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
@@ -38,13 +69,14 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
   }
   const posts = await Promise.all(
     files.map(async (filename): Promise<BlogPost> => {
-      const markdown = await readFile(path.join(blogDirectory, filename), "utf8");
+      const filePath = path.join(blogDirectory, filename);
+      const markdown = await readFile(filePath, "utf8");
       const data = readFrontMatter(markdown);
       const slug = filename.replace(/\.md$/i, "");
       return {
         slug,
-        title: data.title || slug.replace(/[-_]/g, " "),
-        date: data.date || "",
+        title: getTitleFromFilename(filename),
+        date: (await getGitAddedDate(filePath)) || data.date || "",
         description: data.description || "A working note from Luke Cheng.",
         filename,
       };
