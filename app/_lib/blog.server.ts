@@ -80,7 +80,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
       const gitDate = await getGitAddedDate(filename);
       return {
         slug,
-        title: slugToTitle(slug),
+        title: data.name || slugToTitle(slug),
         date: gitDate,
         description: data.description || "A working note from Luke Cheng.",
         filename,
