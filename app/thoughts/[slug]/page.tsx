@@ -21,7 +21,6 @@ export async function generateMetadata({ params }: BlogPostRouteProps): Promise<
   if (!post) return {};
 
   return {
-    title: `${post.title} | Luke Cheng`,
     description: post.description,
   };
 }

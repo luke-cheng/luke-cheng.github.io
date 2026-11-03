@@ -22,20 +22,23 @@ const execFileAsync = promisify(execFile);
 function getTitleFromFilename(filename: string) {
   return filename
     .replace(/\.md$/i, "")
-    .replace(/[-_]/g, " ")
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
-async function getGitAddedDate(filePath: string) {
+async function getGitAddedDate(filename: string) {
   try {
     const { stdout } = await execFileAsync("git", [
+      "-C",
+      blogDirectory,
       "log",
       "--diff-filter=A",
       "--follow",
       "--format=%aI",
       "--reverse",
       "--",
-      filePath,
+      filename,
     ]);
     const firstCommitDate = stdout
       .split(/\r?\n/)
@@ -47,9 +50,16 @@ async function getGitAddedDate(filePath: string) {
   }
 }
 
-async function getGitLastUpdatedDate(filePath: string) {
+async function getGitLastUpdatedDate(filename: string) {
   try {
-    const { stdout } = await execFileAsync("git", ["log", "--format=%aI", "--", filePath]);
+    const { stdout } = await execFileAsync("git", [
+      "-C",
+      blogDirectory,
+      "log",
+      "--format=%aI",
+      "--",
+      filename,
+    ]);
     const latestCommitDate = stdout
       .split(/\r?\n/)
       .map((line) => line.trim())
@@ -87,8 +97,8 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
       const markdown = await readFile(filePath, "utf8");
       const data = readFrontMatter(markdown);
       const slug = filename.replace(/\.md$/i, "");
-      const createdDate = (await getGitAddedDate(filePath)) || data.date || "";
-      const updatedDate = (await getGitLastUpdatedDate(filePath)) || createdDate;
+      const createdDate = (await getGitAddedDate(filename)) || data.date || "";
+      const updatedDate = (await getGitLastUpdatedDate(filename)) || createdDate;
       return {
         slug,
         title: getTitleFromFilename(filename),
