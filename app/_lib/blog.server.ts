@@ -6,7 +6,8 @@ import { promisify } from "node:util";
 export type BlogPost = {
   slug: string;
   title: string;
-  date: string;
+  createdDate: string;
+  updatedDate: string;
   description: string;
   filename: string;
 };
@@ -18,8 +19,9 @@ const contentDirectory = path.resolve(process.cwd(), process.env.CONTENT_DIR ?? 
 const blogDirectory = path.join(contentDirectory, "blogs");
 const execFileAsync = promisify(execFile);
 
-function slugToTitle(slug: string) {
-  return slug
+function getTitleFromFilename(filename: string) {
+  return filename
+    .replace(/\.md$/i, "")
     .replace(/[-_]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
@@ -38,14 +40,31 @@ async function getGitAddedDate(filename: string) {
       "--",
       filename,
     ]);
-    const firstEntry = stdout
+    const firstCommitDate = stdout
       .split(/\r?\n/)
       .map((line) => line.trim())
       .find(Boolean);
-    if (!firstEntry) return "";
-    const date = new Date(firstEntry);
-    if (Number.isNaN(date.getTime())) return "";
-    return date.toISOString().slice(0, 10);
+    return firstCommitDate ? firstCommitDate.slice(0, 10) : "";
+  } catch {
+    return "";
+  }
+}
+
+async function getGitLastUpdatedDate(filename: string) {
+  try {
+    const { stdout } = await execFileAsync("git", [
+      "-C",
+      blogDirectory,
+      "log",
+      "--format=%aI",
+      "--",
+      filename,
+    ]);
+    const latestCommitDate = stdout
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .find(Boolean);
+    return latestCommitDate ? latestCommitDate.slice(0, 10) : "";
   } catch {
     return "";
   }
@@ -74,21 +93,24 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
   }
   const posts = await Promise.all(
     files.map(async (filename): Promise<BlogPost> => {
-      const markdown = await readFile(path.join(blogDirectory, filename), "utf8");
+      const filePath = path.join(blogDirectory, filename);
+      const markdown = await readFile(filePath, "utf8");
       const data = readFrontMatter(markdown);
       const slug = filename.replace(/\.md$/i, "");
-      const gitDate = await getGitAddedDate(filename);
+      const createdDate = (await getGitAddedDate(filename)) || data.date || "";
+      const updatedDate = (await getGitLastUpdatedDate(filename)) || createdDate;
       return {
         slug,
-        title: data.name || slugToTitle(slug),
-        date: gitDate,
+        title: data.name || getTitleFromFilename(filename),
+        createdDate,
+        updatedDate,
         description: data.description || "A working note from Luke Cheng.",
         filename,
       };
     }),
   );
 
-  return posts.sort((first, second) => second.date.localeCompare(first.date));
+  return posts.sort((first, second) => second.createdDate.localeCompare(first.createdDate));
 }
 
 export async function getBlogPost(slug: string) {

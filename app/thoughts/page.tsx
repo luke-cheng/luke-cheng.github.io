@@ -15,7 +15,11 @@ export default async function ThoughtsPage() {
             href={`/thoughts/${encodeURIComponent(post.slug)}/`}
             key={post.slug}
           >
-            <time dateTime={post.date}>{post.date}</time>
+            <p>
+              <time dateTime={post.createdDate}>Created: {post.createdDate}</time>
+              {" · "}
+              <time dateTime={post.updatedDate}>Updated: {post.updatedDate}</time>
+            </p>
             <h2>{post.title}</h2>
             <p>{post.description}</p>
           </Link>
