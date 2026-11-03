@@ -101,7 +101,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
       const updatedDate = (await getGitLastUpdatedDate(filename)) || createdDate;
       return {
         slug,
-        title: getTitleFromFilename(filename),
+        title: data.name || getTitleFromFilename(filename),
         createdDate,
         updatedDate,
         description: data.description || "A working note from Luke Cheng.",
