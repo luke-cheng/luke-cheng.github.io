@@ -5,13 +5,9 @@ export default function HomePage() {
         <section className="generated-canvas landing-canvas">
           <p className="eyebrow">Hi, I&#39;m Luke</p>
           <h1>
-            A developer.
-            <br />
-            was a chemist.
-            <br />
-            driven by a shared curiosity for how our worlds work.
+            Welcome to my website
           </h1>
-          <p>Use the navigation above to explore, or start a chat.</p>
+          <p>This site is best view with AI enabled browser (i.e. Chrome 148)</p>
         </section>
       </div>
     </main>
