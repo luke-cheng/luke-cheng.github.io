@@ -8,7 +8,7 @@ function SiteFooter() {
   return (
     <footer className="site-footer">
       <p>
-        This website is proudly powered by your browser&#39;s on-device AI.
+        Portfolio assistant runs in your browser on supported devices.
       </p>
       <nav className="footer-links" aria-label="Luke Cheng links">
         <a

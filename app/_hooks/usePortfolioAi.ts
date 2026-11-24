@@ -55,6 +55,7 @@ export function usePortfolioAi() {
   });
 
   const {
+    phase,
     isReady,
     isGenerating,
     error: generationError,
@@ -166,6 +167,7 @@ export function usePortfolioAi() {
     suggestions,
     isReady,
     isGenerating,
+    isPromptApiUnavailable: phase.status === "unavailable",
     generationError,
     statusLabel,
     onQuestionChange: setQuestion,

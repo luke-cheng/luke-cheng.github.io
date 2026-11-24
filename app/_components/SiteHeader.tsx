@@ -1,15 +1,23 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BriefcaseIcon, ChatCircleDotsIcon, LightbulbIcon, PersonSimpleSkiIcon } from "@phosphor-icons/react";
+import {
+  BriefcaseIcon,
+  ChatCircleDotsIcon,
+  LightbulbIcon,
+  MoonIcon,
+  SunIcon,
+  UserIcon,
+} from "@phosphor-icons/react";
 
-type SitePage = "home" | "work" | "interests" | "thoughts" | "chat";
+type SitePage = "home" | "work" | "thought" | "about" | "chat";
 
 function getCurrentPage(pathname: string): SitePage {
   if (pathname.startsWith("/work")) return "work";
-  if (pathname.startsWith("/interests")) return "interests";
-  if (pathname.startsWith("/thoughts")) return "thoughts";
+  if (pathname.startsWith("/thoughts")) return "thought";
+  if (pathname.startsWith("/about")) return "about";
   if (pathname.startsWith("/chat")) return "chat";
   return "home";
 }
@@ -18,10 +26,11 @@ function StaticNavigation({ page }: { page: SitePage }) {
   return (
     <>
       <Link
-        className={`ui-button ui-button--tab ${page === "chat" ? "active" : ""}`}
-        href="/chat/"
-        aria-current={page === "chat" ? "page" : undefined}>
-        <ChatCircleDotsIcon /> Chat
+        className={`ui-button ui-button--tab ${page === "about" || page === "home" ? "active" : ""}`}
+        href="/about/"
+        aria-current={page === "about" || page === "home" ? "page" : undefined}
+      >
+        <UserIcon /> About
       </Link>
       <Link
         className={`ui-button ui-button--tab ${page === "work" ? "active" : ""}`}
@@ -31,18 +40,18 @@ function StaticNavigation({ page }: { page: SitePage }) {
         <BriefcaseIcon /> Work
       </Link>
       <Link
-        className={`ui-button ui-button--tab ${page === "interests" ? "active" : ""}`}
-        href="/interests/"
-        aria-current={page === "interests" ? "page" : undefined}
+        className={`ui-button ui-button--tab ${page === "thought" ? "active" : ""}`}
+        href="/thoughts/"
+        aria-current={page === "thought" ? "page" : undefined}
       >
-        <PersonSimpleSkiIcon /> Interests
+        <LightbulbIcon /> Thought
       </Link>
       <Link
-        className={`ui-button ui-button--tab ${page === "thoughts" ? "active" : ""}`}
-        href="/thoughts/"
-        aria-current={page === "thoughts" ? "page" : undefined}
+        className={`ui-button ui-button--tab ${page === "chat" ? "active" : ""}`}
+        href="/chat/"
+        aria-current={page === "chat" ? "page" : undefined}
       >
-        <LightbulbIcon /> Thoughts
+        <ChatCircleDotsIcon /> Chat
       </Link>
     </>
   );
@@ -50,16 +59,45 @@ function StaticNavigation({ page }: { page: SitePage }) {
 
 function SiteHeader() {
   const page = getCurrentPage(usePathname() ?? "/");
+  const [theme, setTheme] = useState<"light" | "dark">(() =>
+    typeof document !== "undefined" &&
+      document.documentElement.getAttribute("data-theme") === "dark"
+      ? "dark"
+      : "light",
+  );
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "light" ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", nextTheme);
+    localStorage.setItem("luke-theme", nextTheme);
+    setTheme(nextTheme);
+  };
 
   return (
     <header className="site-header">
       <div className="header-top">
         <Link className="ui-button ui-button--identity" href="/">
-          <strong>Luke Cheng</strong>
+          <strong>Luke_Cheng</strong>
         </Link>
-        <nav className="tab-nav" aria-label="Site navigation">
-          <StaticNavigation page={page} />
-        </nav>
+        <div className="header-controls">
+          <nav className="tab-nav" aria-label="Site navigation">
+            <StaticNavigation page={page} />
+          </nav>
+          <button
+            className="ui-button ui-button--tab theme-toggle"
+            type="button"
+            onClick={toggleTheme}
+            aria-label="Toggle color theme"
+            aria-pressed={theme === "dark"}
+            title={`Switch to ${theme === "light" ? "dark" : "light"} theme`}
+          >
+            {theme === "light" ? (
+              <MoonIcon aria-hidden="true" />
+            ) : (
+              <SunIcon aria-hidden="true" />
+            )}
+          </button>
+        </div>
       </div>
     </header>
   );

@@ -16,18 +16,6 @@ function SiteFrame({ children }: { children: ReactNode }) {
         <SiteHeader />
         {children}
         <FloatingChatBar />
-        {ai.generationError && (
-          <div className="inline-error" role="alert">
-            <strong>{ai.generationError.name}:</strong> {ai.generationError.message}
-            <button
-              className="ui-button ui-button--inline"
-              type="button"
-              onClick={ai.onDismissError}
-            >
-              Dismiss
-            </button>
-          </div>
-        )}
         <SiteFooter />
       </div>
     </PortfolioAiContext.Provider>
