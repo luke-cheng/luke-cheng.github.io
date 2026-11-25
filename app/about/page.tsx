@@ -2,13 +2,13 @@ import Link from "next/link";
 
 const careerMilestones = [
   {
-    period: "2025 — Present",
-    organization: "JPMorgan Chase",
+    period: "2025 - Present",
+    organization: "JPMorgan Chase & Co.",
     role: "Software Engineer",
   },
   {
     period: "2024 - 2025",
-    organization: "MOYU",
+    organization: "MOYU LLC",
     role: "Co-Founder & Lead Developer",
   },
   {
@@ -17,8 +17,8 @@ const careerMilestones = [
     role: "Grad School & part-time Dev",
   },
   {
-    period: "2021 — 2022",
-    organization: "ChemPacific",
+    period: "2021 - 2022",
+    organization: "ChemPacific Corp.",
     role: "Research Scientist",
   },
   {
