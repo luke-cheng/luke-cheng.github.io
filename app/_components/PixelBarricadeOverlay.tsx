@@ -71,10 +71,12 @@ export function PixelBarricadeOverlay({
         <div className="pixel-barricade-overlay__board">
           {tag && <div className="pixel-barricade-overlay__tag">{tag}</div>}
           <div className="pixel-barricade-overlay__message">{message}</div>
-          <div className="pixel-barricade-overlay__details">
-            <strong>📋 CHAT DETAILS:</strong>
+          <details className="pixel-barricade-overlay__details">
+            <summary>
+              <strong>📋 CHAT DETAILS:</strong>
+            </summary>
             <span>{details}</span>
-          </div>
+          </details>
           {progress !== undefined && (
             <progress
               className="pixel-barricade-overlay__progress"

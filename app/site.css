@@ -623,8 +623,24 @@ a:focus-visible {
   font: 10px/1.45 var(--mono);
   overflow-wrap: anywhere;
 }
-.pixel-barricade-overlay__details[hidden] {
-  display: none;
+.pixel-barricade-overlay__details > summary {
+  cursor: pointer;
+}
+.pixel-barricade-overlay__details::details-content {
+  interpolate-size: allow-keywords;
+  overflow: clip;
+  contain: layout;
+}
+.pixel-barricade-overlay__details:not([open])::details-content {
+  block-size: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pixel-barricade-overlay__details::details-content {
+    transition: block-size, content-visibility, display;
+    transition-duration: 0.25s;
+    transition-timing-function: ease-in-out;
+    transition-behavior: allow-discrete;
+  }
 }
 .pixel-barricade-overlay__progress {
   width: 100%;
