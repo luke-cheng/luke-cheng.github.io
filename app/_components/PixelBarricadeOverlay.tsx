@@ -73,7 +73,7 @@ export function PixelBarricadeOverlay({
           <div className="pixel-barricade-overlay__message">{message}</div>
           <details className="pixel-barricade-overlay__details">
             <summary>
-              <strong>📋 CHAT DETAILS:</strong>
+              <strong>📋 DETAILS:</strong>
             </summary>
             <span>{details}</span>
           </details>
