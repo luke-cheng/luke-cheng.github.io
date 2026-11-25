@@ -7,14 +7,24 @@ const careerMilestones = [
     role: "Software Engineer",
   },
   {
-    period: "2024 — 2025",
+    period: "2024 - 2025",
     organization: "MOYU",
     role: "Co-Founder & Lead Developer",
+  },
+  {
+    period: "2022 - 2024",
+    organization: "University of Pittsburgh",
+    role: "Grad School & part-time Dev",
   },
   {
     period: "2021 — 2022",
     organization: "ChemPacific",
     role: "Research Scientist",
+  },
+  {
+    period: "2016 - 2020",
+    organization: "Virginia Tech",
+    role: "Chemistry UnderGrad",
   },
 ];
 
@@ -39,11 +49,6 @@ export default function AboutPage() {
             <Link className="home-action" href="/chat/">
               Ask the on-device assistant
             </Link>
-          </nav>
-          <p className="home-ai-note">
-            <span className="status-dot ready" aria-hidden="true" />
-            The portfolio assistant runs in your browser on supported devices.
-          </p>
         </div>
 
         <aside className="home-aside" aria-label="Career highlights">
