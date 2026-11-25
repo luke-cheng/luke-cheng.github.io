@@ -7,9 +7,6 @@ import {
 function SiteFooter() {
   return (
     <footer className="site-footer">
-      <p>
-        Portfolio assistant runs in your browser on supported devices.
-      </p>
       <nav className="footer-links" aria-label="Luke Cheng links">
         <a
           href="https://github.com/Luke-Cheng"
