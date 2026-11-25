@@ -20,17 +20,33 @@ export default function FloatingChatBar() {
   const router = useRouter();
   const pathname = usePathname() ?? "/";
   const pageContext = getPageContext(pathname);
-  const [isUnavailableDismissed, setIsUnavailableDismissed] = useState(false);
-  const showUnavailableNotice = ai.isPromptApiUnavailable && !isUnavailableDismissed;
+  const [isNoticeDismissed, setIsNoticeDismissed] = useState(false);
+  const isDownloading = ai.promptApiPhase.status === "downloading";
   const showErrorNotice = Boolean(ai.generationError);
+  const showUnavailableNotice =
+    !ai.isReady &&
+    !isDownloading &&
+    !showErrorNotice &&
+    !isNoticeDismissed;
   const showNotice = showErrorNotice || showUnavailableNotice;
+  const downloadProgress =
+    ai.promptApiPhase.status === "downloading"
+      ? Math.min(
+          100,
+          Math.max(
+            0,
+            ai.promptApiPhase.progress <= 1
+              ? ai.promptApiPhase.progress * 100
+              : ai.promptApiPhase.progress,
+          ),
+        )
+      : 0;
 
   const handleNoticeDismiss = () => {
     if (showErrorNotice) {
       ai.onDismissError();
-    } else {
-      setIsUnavailableDismissed(true);
     }
+    setIsNoticeDismissed(true);
   };
 
   const openChat = () => {
@@ -58,7 +74,9 @@ export default function FloatingChatBar() {
             <strong className="inline-error__title">
               {showErrorNotice
                 ? "The on-device AI hit a snag"
-                : "On-device AI isn't available"}
+                : ai.promptApiPhase.status === "unavailable"
+                  ? "On-device AI isn't available"
+                  : "On-device AI isn't ready yet"}
             </strong>
             <button
               className="ui-button ui-button--inline"
@@ -72,82 +90,105 @@ export default function FloatingChatBar() {
             <p className="inline-error__message">
               {showErrorNotice
                 ? "The browser couldn't start or complete the request. Expand the details to inspect the error."
-                : "This browser doesn't support on-device AI, so chat isn't available here."}
+                : ai.promptApiPhase.status === "unavailable"
+                  ? "This browser doesn't support on-device AI, so chat isn't available here."
+                  : "The browser is checking whether on-device AI can be started."}
             </p>
-            {ai.generationError && (
-              <details>
-                <summary>Technical details</summary>
-                <p className="inline-error__raw">
-                  <strong>{ai.generationError.name || "Error"}:</strong>{" "}
-                  {ai.generationError.message || "No additional details were provided."}
-                </p>
-              </details>
-            )}
+            <details>
+              <summary>Technical details</summary>
+              <p className="inline-error__raw">
+                {ai.generationError ? (
+                  <>
+                    <strong>{ai.generationError.name || "Error"}:</strong>{" "}
+                    {ai.generationError.message || "No additional details were provided."}
+                  </>
+                ) : (
+                  <>
+                    Prompt API status: {ai.promptApiPhase.status}.
+                    {ai.promptApiPhase.status === "unavailable" &&
+                      " The browser does not expose a compatible Prompt API."}
+                  </>
+                )}
+              </p>
+            </details>
           </div>
         </div>
       )}
-      <section
-        className="floating-chat-bar"
-        aria-label="AI chat composer"
-        inert={showNotice}
-      >
-        {ai.suggestions.length > 0 && (
-          <div className="question-suggestions" aria-label="Suggested questions">
-            {ai.suggestions.map((suggestion) => (
-              <button
-                key={suggestion}
-                className="ui-button ui-button--pill"
-                type="button"
-                onClick={() => handleSuggestionSelect(suggestion)}
-                disabled={!ai.isReady || ai.isGenerating}
-              >
-                {suggestion}
-              </button>
-            ))}
-          </div>
-        )}
-        <form className="question-bar" onSubmit={handleSubmit}>
-          <span className="prompt-symbol" aria-hidden="true">
-            <SparkleIcon fontSize="inherit" />
-          </span>
-          <input
-            value={ai.question}
-            onChange={(event) => ai.onQuestionChange(event.target.value)}
-            placeholder={
-              ai.isReady
-                ? "Ask me anything about Luke..."
-                : ai.statusLabel === "Local AI unavailable"
-                  ? "Local AI is unavailable in this browser"
-                  : "Preparing local AI..."
-            }
-            aria-label="Ask the portfolio a question"
-            disabled={!ai.isReady || ai.isGenerating}
+      {!showNotice && isDownloading && (
+        <div className="download-status" role="status" aria-live="polite">
+          <strong>Preparing local AI</strong>
+          <p>Downloading the on-device model ({Math.round(downloadProgress)}%).</p>
+          <progress
+            className="download-status__progress"
+            max={100}
+            value={downloadProgress}
+            aria-label={`Downloading local AI: ${Math.round(downloadProgress)}%`}
           />
-          <span className="model-status">
-            <span className={`status-dot ${ai.isReady ? "ready" : ""}`} />
-            {ai.statusLabel}
-          </span>
-          {ai.isGenerating ? (
-            <button
-              className="ui-button ui-button--icon ui-button--stop"
-              type="button"
-              aria-label="Stop generating"
-              onClick={ai.onStop}
-            >
-              <StopIcon fontSize="inherit" />
-            </button>
-          ) : (
-            <button
-              className="ui-button ui-button--icon ui-button--submit"
-              type="submit"
-              aria-label="Ask question"
-              disabled={!ai.isReady || !ai.question.trim()}
-            >
-              <PaperPlaneTiltIcon fontSize="inherit" />
-            </button>
+        </div>
+      )}
+      {!showNotice && !isDownloading && (
+        <section
+          className="floating-chat-bar"
+          aria-label="AI chat composer"
+        >
+          {ai.suggestions.length > 0 && (
+            <div className="question-suggestions" aria-label="Suggested questions">
+              {ai.suggestions.map((suggestion) => (
+                <button
+                  key={suggestion}
+                  className="ui-button ui-button--pill"
+                  type="button"
+                  onClick={() => handleSuggestionSelect(suggestion)}
+                  disabled={!ai.isReady || ai.isGenerating}
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
           )}
-        </form>
-      </section>
+          <form className="question-bar" onSubmit={handleSubmit}>
+            <span className="prompt-symbol" aria-hidden="true">
+              <SparkleIcon fontSize="inherit" />
+            </span>
+            <input
+              value={ai.question}
+              onChange={(event) => ai.onQuestionChange(event.target.value)}
+              placeholder={
+                ai.isReady
+                  ? "Ask me anything about Luke..."
+                  : ai.statusLabel === "Local AI unavailable"
+                    ? "Local AI is unavailable in this browser"
+                    : "Preparing local AI..."
+              }
+              aria-label="Ask the portfolio a question"
+              disabled={!ai.isReady || ai.isGenerating}
+            />
+            <span className="model-status">
+              <span className={`status-dot ${ai.isReady ? "ready" : ""}`} />
+              {ai.statusLabel}
+            </span>
+            {ai.isGenerating ? (
+              <button
+                className="ui-button ui-button--icon ui-button--stop"
+                type="button"
+                aria-label="Stop generating"
+                onClick={ai.onStop}
+              >
+                <StopIcon fontSize="inherit" />
+              </button>
+            ) : (
+              <button
+                className="ui-button ui-button--icon ui-button--submit"
+                type="submit"
+                aria-label="Ask question"
+                disabled={!ai.isReady || !ai.question.trim()}
+              >
+                <PaperPlaneTiltIcon fontSize="inherit" />
+              </button>
+            )}
+          </form>
+        </section>
+      )}
     </div>
   );
 }

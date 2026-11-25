@@ -486,10 +486,6 @@ a:focus-visible {
   z-index: 5;
 }
 .inline-error {
-  position: absolute;
-  inset-inline: 0;
-  inset-block-end: 0;
-  z-index: 2;
   display: flex;
   inline-size: 100%;
   max-block-size: min(40dvh, 18rem);
@@ -540,6 +536,28 @@ a:focus-visible {
   flex: 0 0 auto;
   margin: 0;
   color: var(--error);
+}
+.download-status {
+  display: grid;
+  gap: 4px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-inline-start: 4px solid var(--accent);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--ink) 18%, transparent);
+  font: 12px/1.5 var(--mono);
+}
+.download-status p {
+  margin: 0;
+  color: var(--muted);
+}
+.download-status__progress {
+  inline-size: 100%;
+  block-size: 6px;
+  margin-block-start: 4px;
+  accent-color: var(--accent);
 }
 .floating-chat-bar {
   position: relative;
