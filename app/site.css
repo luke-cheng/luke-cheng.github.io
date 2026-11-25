@@ -17,6 +17,11 @@
   --sans: "Hanken Grotesk", sans-serif;
   --display: "Epilogue", sans-serif;
   --serif: "Playfair Display", serif;
+  --page-width: 70rem;
+  --page-title-size: clamp(2.5rem, calc(1.5rem + 4vw), 5rem);
+  --section-title-size: clamp(1.75rem, calc(1.4rem + 2vw), 2.625rem);
+  --subsection-title-size: clamp(1.25rem, calc(1.1rem + 1vw), 1.875rem);
+  --page-top-space: clamp(3.5rem, 6vw, 5.5rem);
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
@@ -115,7 +120,6 @@ a:focus-visible {
   text-align: left;
   text-decoration: none;
 }
-.eyebrow,
 .model-status,
 .tab-nav span {
   font: 11px var(--mono);
@@ -294,13 +298,14 @@ a:focus-visible {
   align-items: center;
   gap: clamp(40px, 6vw, 84px);
   width: 100%;
-  max-width: 920px;
+  max-width: var(--page-width);
 }
 .stitch-home__hero h1 {
   max-width: 580px;
   margin: 0;
-  font: 600 clamp(40px, 4vw, 56px) / 1.12 var(--display);
+  font: 500 var(--page-title-size) / 0.98 var(--display);
   letter-spacing: -0.06em;
+  text-wrap: balance;
 }
 .stitch-home__hero > div > p {
   max-width: 560px;
@@ -354,30 +359,34 @@ a:focus-visible {
   color: var(--error);
 }
 .home-page {
-  padding: clamp(52px, 8vw, 104px) 0 48px;
+  padding: var(--page-top-space) 0 48px;
 }
 .home-hero {
   display: grid;
   grid-template-columns: minmax(0, 1.55fr) minmax(260px, 0.75fr);
   align-items: center;
   gap: clamp(42px, 8vw, 112px);
-  max-width: 1140px;
+  max-width: var(--page-width);
   min-height: min(660px, calc(100dvh - 230px));
   margin: 0 auto;
 }
 .home-copy {
   max-width: 760px;
 }
-.home-copy > .eyebrow {
-  margin-bottom: 22px;
-  color: var(--coral);
+.page-heading {
+  max-inline-size: 52rem;
+  margin-block-end: clamp(2.5rem, 4vw, 3.25rem);
 }
-.home-copy h1 {
+.page-heading h1 {
   margin: 0;
-  font: 600 clamp(44px, 6.2vw, 82px) / 1.02 var(--display);
-  letter-spacing: -0.065em;
+  font: 500 var(--page-title-size) / 0.98 var(--display);
+  letter-spacing: -0.06em;
+  text-wrap: balance;
 }
-.home-copy h1 em {
+.home-copy .page-heading {
+  margin-block-end: 1.75rem;
+}
+.home-copy .page-heading h1 em {
   display: block;
   margin-top: 0.08em;
   color: var(--coral);
@@ -387,7 +396,7 @@ a:focus-visible {
 }
 .home-lead {
   max-width: 590px;
-  margin: 28px 0 0;
+  margin: 0;
   color: var(--muted);
   font-size: clamp(17px, 1.7vw, 20px);
   line-height: 1.55;
@@ -445,10 +454,6 @@ a:focus-visible {
   border-left: 1px solid var(--line);
   padding-left: clamp(20px, 3vw, 38px);
 }
-.home-career > .eyebrow {
-  margin: 0 0 14px;
-  color: var(--coral);
-}
 .home-career ul {
   margin: 0;
   padding: 0;
@@ -473,9 +478,6 @@ a:focus-visible {
   margin: 2px 0 0;
   color: var(--muted);
   font-size: 13px;
-}
-.eyebrow {
-  color: var(--muted);
 }
 .chat-dock {
   position: fixed;
@@ -557,9 +559,9 @@ a:focus-visible {
 }
 .chat-page {
   min-height: calc(100svh - 128px);
-  max-width: 900px;
+  max-width: var(--page-width);
   margin: auto;
-  padding: 64px 0 178px;
+  padding: var(--page-top-space) 0 178px;
 }
 .chat-welcome {
   display: grid;
@@ -572,10 +574,11 @@ a:focus-visible {
 }
 .chat-welcome h2 {
   margin: 0 0 10px;
-  font-size: clamp(32px, 4vw, 48px);
+  font-family: var(--display);
+  font-size: var(--section-title-size);
   font-weight: 500;
-  line-height: 1;
-  letter-spacing: -0.06em;
+  line-height: 1.08;
+  letter-spacing: -0.05em;
 }
 .chat-welcome p {
   max-width: 470px;
@@ -701,30 +704,26 @@ a:focus-visible {
 .profile-content,
 .blog-index-page {
   inline-size: 100%;
-  max-inline-size: 900px;
+  max-inline-size: var(--page-width);
   margin-inline: auto;
-  padding-block: 88px 70px;
+  padding-block: var(--page-top-space) 70px;
 }
-.profile-content > h1,
-.blog-index-page > h1 {
-  max-width: 820px;
-  margin: 18px 0 52px;
-  font-size: clamp(44px, 5.8vw, 88px);
-  font-weight: 500;
-  line-height: 0.98;
-  letter-spacing: -0.07em;
+.profile-content article {
+  max-inline-size: 80ch;
 }
 .profile-content article h2 {
   margin: 46px 0 24px;
   padding-top: 16px;
   border-top: 1px solid var(--ink);
-  font-size: clamp(28px, 4vw, 42px);
+  font-family: var(--display);
+  font-size: var(--section-title-size);
   font-weight: 500;
+  line-height: 1.08;
   letter-spacing: -0.05em;
 }
 .profile-content article h3 {
   margin: 32px 0 8px;
-  font-size: clamp(21px, 2.8vw, 30px);
+  font-size: var(--subsection-title-size);
   line-height: 1.15;
 }
 .profile-content article p,
@@ -760,9 +759,10 @@ a:focus-visible {
 }
 .post-card h2 {
   margin: 8px 0;
-  font-size: clamp(24px, 3vw, 38px);
+  font-family: var(--display);
+  font-size: var(--section-title-size);
   font-weight: 500;
-  line-height: 1.05;
+  line-height: 1.08;
   letter-spacing: -0.05em;
   transition: color 0.15s ease;
 }
@@ -899,7 +899,7 @@ a:focus-visible {
     display: none;
   }
   .chat-page {
-    padding: 58px 0 194px;
+    padding: var(--page-top-space) 0 194px;
   }
   .chat-welcome {
     min-height: calc(100svh - 330px);
@@ -918,25 +918,13 @@ a:focus-visible {
     grid-template-columns: minmax(0, 1fr);
     gap: 42px;
   }
-  .stitch-home__hero h1 {
-    font-size: clamp(42px, 12vw, 58px);
-  }
   .home-page {
-    padding-top: 48px;
+    padding-top: var(--page-top-space);
   }
   .home-hero {
     grid-template-columns: minmax(0, 1fr);
     gap: 42px;
     min-height: auto;
-  }
-  .home-copy h1 {
-    font-size: clamp(42px, 12vw, 64px);
-  }
-  .home-copy > .eyebrow {
-    margin-bottom: 16px;
-  }
-  .home-lead {
-    margin-top: 20px;
   }
   .home-actions {
     gap: 8px;
@@ -960,11 +948,7 @@ a:focus-visible {
   }
   .profile-content,
   .blog-index-page {
-    padding-block-start: 58px;
-  }
-  .profile-content > h1,
-  .blog-index-page > h1 {
-    margin-bottom: 38px;
+    padding-block-start: var(--page-top-space);
   }
   .blog-article-page {
     padding-top: 42px;

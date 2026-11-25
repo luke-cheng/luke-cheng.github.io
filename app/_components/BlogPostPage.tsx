@@ -21,7 +21,6 @@ const MODEL_OPTIONS: LanguageModelCreateCoreOptions = {
 function BlogPostPage({ post, draft, initialArticleHtml }: BlogPostPageProps) {
   const [article, setArticle] = useState(initialArticleHtml);
   const [isExpanding, setIsExpanding] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
   const [expansionError, setExpansionError] = useState("");
 
   useEffect(() => {
@@ -35,7 +34,6 @@ function BlogPostPage({ post, draft, initialArticleHtml }: BlogPostPageProps) {
         if (cached) {
           if (active) {
             setArticle(cached);
-            setIsExpanded(true);
           }
           return;
         }
@@ -81,7 +79,6 @@ function BlogPostPage({ post, draft, initialArticleHtml }: BlogPostPageProps) {
 
         if (active) {
           const sanitized = sanitizeHtml(renderMarkdown(expanded), MARKDOWN_SANITIZER);
-          setIsExpanded(true);
           try {
             sessionStorage.setItem(storageKey, sanitized);
           } catch {
@@ -108,13 +105,11 @@ function BlogPostPage({ post, draft, initialArticleHtml }: BlogPostPageProps) {
   return (
     <main className="blog-article-page">
       <Link className="all-posts-link" href="/thoughts/">← All posts</Link>
-      {isExpanding ? (
+      {isExpanding && (
         <GenerationNotice
           title="Writing..."
           description="Turning this draft into a real article."
         />
-      ) : (
-        <p className="eyebrow">{isExpanded ? "Article" : "Draft"}</p>
       )}
       {expansionError && (
         <p className="blog-ai-note">Showing the original draft. {expansionError}</p>

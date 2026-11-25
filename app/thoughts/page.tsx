@@ -6,8 +6,9 @@ export default async function ThoughtsPage() {
 
   return (
     <main className="blog-index-page">
-      <p className="eyebrow">Thoughts / Writing</p>
-      <h1>Some thoughts.</h1>
+      <header className="page-heading">
+        <h1>Thoughts</h1>
+      </header>
       <div className="post-list" aria-label="Blog posts, newest first">
         {posts.map((post) => (
           <Link

@@ -23,11 +23,12 @@ export default function AboutPage() {
     <main className="home-page">
       <section className="home-hero" aria-labelledby="about-title">
         <div className="home-copy">
-          <p className="eyebrow">Software engineer / New York City</p>
-          <h1 id="about-title">
-            From scientist to developer,
-            <em> keep digging on how things work.</em>
-          </h1>
+          <header className="page-heading">
+            <h1 id="about-title">
+              From scientist to developer,
+              <em> keep digging on how things work.</em>
+            </h1>
+          </header>
           <p className="home-lead">
             I build practical AI workflows and dependable software systems.
           </p>
@@ -47,7 +48,6 @@ export default function AboutPage() {
 
         <aside className="home-aside" aria-label="Career highlights">
           <div className="home-career">
-            <p className="eyebrow">A few chapters</p>
             <ul>
               {careerMilestones.map((milestone) => (
                 <li key={milestone.organization}>
