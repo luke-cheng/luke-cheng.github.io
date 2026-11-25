@@ -49,6 +49,7 @@ export default function AboutPage() {
             <Link className="home-action" href="/chat/">
               Ask the on-device assistant
             </Link>
+          </nav>
         </div>
 
         <aside className="home-aside" aria-label="Career highlights">
