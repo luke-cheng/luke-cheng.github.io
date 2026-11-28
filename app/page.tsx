@@ -5,8 +5,7 @@ export default function HomePage() {
         <div>
           <h1 id="home-title">Hi, welcome to my website.</h1>
           <p>
-            Yes, I&apos;m a human, was a chemist, always a thinker, now a
-            developer empowered by AI.
+            Yes, I&apos;m a human, was a chemist, always a thinker, now a developer empowered by AI.
           </p>
         </div>
 

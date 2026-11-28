@@ -47,6 +47,20 @@ export function PixelBarricadeOverlay({
         <rect x="1" y="18" width="14" height="4" fill="#18181b" />
         <rect x="0" y="21" width="16" height="3" fill="#f97316" />
       </svg>
+      <svg
+        className="pixel-barricade-overlay__cone pixel-barricade-overlay__cone--right"
+        viewBox="0 0 16 24"
+        aria-hidden="true"
+      >
+        <rect x="7" y="1" width="2" height="2" fill="#fff" />
+        <rect x="6" y="3" width="4" height="3" fill="#f97316" />
+        <rect x="5" y="6" width="6" height="3" fill="#fff" />
+        <rect x="4" y="9" width="8" height="3" fill="#f97316" />
+        <rect x="3" y="12" width="10" height="3" fill="#fff" />
+        <rect x="2" y="15" width="12" height="3" fill="#f97316" />
+        <rect x="1" y="18" width="14" height="4" fill="#18181b" />
+        <rect x="0" y="21" width="16" height="3" fill="#f97316" />
+      </svg>
       <div className="pixel-barricade-overlay__sign">
         <svg
           className="pixel-barricade-overlay__character"

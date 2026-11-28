@@ -137,7 +137,7 @@ export default function FloatingChatBar() {
             details={barricadeDetails}
             message={barricadeMessage}
             progress={isDownloading ? downloadProgress : undefined}
-            tag="WARNING"
+            tag="DETOUR"
           />
         )}
       </section>
